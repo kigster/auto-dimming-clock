@@ -23,16 +23,15 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/arduino/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Adafruit-GFX-Library}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Adafruit-LED-Backpack-Library}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/DS1307RTC}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Encoder}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Encoder/utility}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/LiquidCrystal_I2C2004V1}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/OneButton}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/RotaryEncoderWithButton}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/SimpleTimer}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Time}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Wire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Wire/utility}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/ClickEncoder}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/SimpleTimer}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/LiquidCrystal_I2C2004V1}&quot;"/>
 								</option>
 								<inputType id="it.baeyens.arduino.compiler.cpp.sketch.input.679939265" name="CPP source files" superClass="it.baeyens.arduino.compiler.cpp.sketch.input"/>
 							</tool>
@@ -42,16 +41,15 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/arduino/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Adafruit-GFX-Library}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Adafruit-LED-Backpack-Library}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/DS1307RTC}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Encoder}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Encoder/utility}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/LiquidCrystal_I2C2004V1}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/OneButton}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/RotaryEncoderWithButton}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/SimpleTimer}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Time}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Wire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Wire/utility}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/ClickEncoder}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/SimpleTimer}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/LiquidCrystal_I2C2004V1}&quot;"/>
 								</option>
 								<inputType id="it.baeyens.arduino.compiler.c.sketch.input.446528251" name="C Source Files" superClass="it.baeyens.arduino.compiler.c.sketch.input"/>
 							</tool>
