@@ -1,18 +1,16 @@
 /*
- * TwoLeds – this example demonstrates using RotaryEncoder with a button.
+ * WallClock
  *
- * Dependencies for the library:
- * http://www.pjrc.com/teensy/td_libs_Encoder.html
+ * 7-Segment Display for current time, based on the RTC chip.
  *
- * Dependencies for the example:
+ * Rotary encoder is used to set the time.
  *
- * RotaryEncoderWithButton library
- * SimpleTimer library
+ * Press and hold to enter configuration menu, then click to advance
+ * to the next.
  *
- *  Created on: Aug 9, 2014
- *      Author: Konstantin Gredeskoul
+ * (c) 2014 All rights reserved.  Please see LICENSE.
  *
- *  (c) 2014 All rights reserved.  Please see LICENSE.
+ * Author: Konstantin Gredeskoul <kigster@gmail.com>
  */
 
 #include <RotaryEncoderWithButton.h>
