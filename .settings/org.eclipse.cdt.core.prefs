@@ -313,7 +313,7 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.BOARD_NAME/value=Arduino Pro or Pro Mini
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PORT/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PORT/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PORT/value=/dev/tty.usbserial-AH02MB22
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PORT/value=/dev/cu.usbserial-AH02MB22
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PROGMR/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PROGMR/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PROGMR/value=Default

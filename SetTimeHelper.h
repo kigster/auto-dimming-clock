@@ -1,5 +1,5 @@
 /*
- * CompileTimeManager.h
+ * SetTimeHelper.h
  *
  *  Created on: Nov 28, 2014
  *      Author: Konstantin Gredeskoul
@@ -13,21 +13,22 @@
 #define TEENSYTIMEMANAGER_H_
 
 #include <Time.h>
+#include <DS1307RTC.h>
 
 typedef void(*timeCallback)(tmElements_t);
 
-class CompileTimeManager {
+class SetTimeHelper {
 public:
-    CompileTimeManager(timeCallback setTimeCallback);
+    SetTimeHelper();
     bool setTimeToCompileTime();
     bool setTimeTo(uint8_t h, uint8_t m);
+    bool setTimeTo(tmElements_t tm);
 
 private:
     tmElements_t tm;
-    timeCallback setTimeCallback;
     char *monthNames[12];
-    bool getTime(const char *str);
-    bool getDate(const char *str);
+    bool getCompileDate();
+    bool getCompileTime();
 };
 
 #endif /* TIMEMANAGER_H_ */

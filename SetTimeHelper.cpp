@@ -1,5 +1,5 @@
 /*
- * CompileTimeManager.cpp
+ * SetTimeHelper.cpp
  *
  *  Created on: Nov 28, 2014
  *      Author: Konstantin Gredeskoul
@@ -8,36 +8,35 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 
-#include "CompileTimeManager.h"
+#include "SetTimeHelper.h"
 
 #include <Time.h>
 #include <Arduino.h>
+
 static const char *monthNamesList[12] = {
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 };
 
-CompileTimeManager::CompileTimeManager(timeCallback timeCallback) {
-    setTimeCallback = timeCallback;
+SetTimeHelper::SetTimeHelper() {
     for (int i = 0; i < 12; i ++) { monthNames[i] = (char *)monthNamesList[i]; }
+    makeTime(tm);
+
 }
 
-bool CompileTimeManager::setTimeToCompileTime() {
+bool SetTimeHelper::setTimeToCompileTime() {
     // get the date and time the compiler was run
-    if (getDate(__DATE__) && getTime(__TIME__)) {
+    if (getCompileDate() && getCompileTime()) {
         // and configure the RTC with this info
-        time_t compileTime = makeTime(tm) + 30;
-        setTime(compileTime);
-        if (setTimeCallback != NULL)
-            setTimeCallback(tm);
-        return true;
+        time_t ctime = makeTime(tm);
+        return setTimeTo(tm);
     }
     return false;
 }
 
-bool CompileTimeManager::getTime(const char *str) {
+bool SetTimeHelper::getCompileTime() {
     int Hour, Min, Sec;
-    if (sscanf(str, "%d:%d:%d", &Hour, &Min, &Sec) != 3)
+    if (sscanf(__TIME__, "%d:%d:%d", &Hour, &Min, &Sec) != 3)
         return false;
     tm.Hour = Hour;
     tm.Minute = Min;
@@ -45,13 +44,14 @@ bool CompileTimeManager::getTime(const char *str) {
     return true;
 }
 
-bool CompileTimeManager::getDate(const char *str) {
+bool SetTimeHelper::getCompileDate() {
     char Month[12];
     int Day, Year;
     uint8_t monthIndex;
 
-    if (sscanf(str, "%s %d %d", Month, &Day, &Year) != 3)
+    if (sscanf(__DATE__, "%s %d %d", Month, &Day, &Year) != 3)
         return false;
+
     for (monthIndex = 0; monthIndex < 12; monthIndex++) {
         if (strcmp(Month, monthNames[monthIndex]) == 0)
             break;
@@ -63,3 +63,14 @@ bool CompileTimeManager::getDate(const char *str) {
     tm.Year = CalendarYrToTm(Year);
     return true;
 }
+
+bool SetTimeHelper::setTimeTo(tmElements_t tm) {
+    time_t compileTime = makeTime(tm);
+    setTime(compileTime);
+    if (RTC.write(tm)) {
+        return true;
+    } else {
+        return true;
+    }
+}
+
