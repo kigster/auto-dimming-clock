@@ -64,7 +64,6 @@ public:
     char buf[30];
     HardwareConfig config;
     bool colonOn, screenOn;
-    char *what;
 
     void setup();
     void loop();
@@ -72,7 +71,8 @@ public:
     void buttonClick();
     void displayTime(signed short h, signed short m);
     void blinkLED();
-    void debugLCD(int row, const char *message, bool clear);
+    void debug(int row, const char *message, bool clear);
+    void debug(const char *message);
     void cb_RotaryButtonClick();
     void cb_RotaryButtonDoubleClick();
     void cb_RotaryButtonHold();

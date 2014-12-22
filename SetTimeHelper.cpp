@@ -28,7 +28,8 @@ bool SetTimeHelper::setTimeToCompileTime() {
     // get the date and time the compiler was run
     if (getCompileDate() && getCompileTime()) {
         // and configure the RTC with this info
-        time_t ctime = makeTime(tm);
+        tm.Hour = 12;
+        tm.Minute = 0;
         return setTimeTo(tm);
     }
     return false;

@@ -20,26 +20,20 @@ WallClockApp::WallClockApp(HardwareConfig configuration) {
     rotary = new RotaryEncoderWithButton(config.pinRotaryLeft, config.pinRotaryRight, config.pinRotaryButton);
     lcd = new LiquidCrystal_I2C(0x3F, 20, config.pinRotaryButton);
     timer = new SimpleTimer(1);
-    screenOn = colonOn = false;
+    screenOn = colonOn = true;
     mode = SetTime::Default;
-    menu = new SetTimeMenu(this);
     helper = new SetTimeHelper();
     brightness = 15;
+    menu = NULL;
 }
 
 void WallClockApp::setup() {
-    Serial.begin(57600);
+    menu = new SetTimeMenu(this);
     pinMode(config.pinLED, OUTPUT);
     pinMode(config.pinPhotoResistor, INPUT);
     pinMode(config.pinRedButton, INPUT_PULLUP);
     matrix->begin(0x70);
     rotary->begin();
-
-    // #define SET_TO_COMPILE_TIME
-#ifdef SET_TO_COMPILE_TIME
-    CompileTimeManager *timeManager = new CompileTimeManager(saveNewTime);
-    timeManager->setTimeToCompileTime();
-#endif
 
     lcd->init();
     // Print a message to the LCD.
@@ -55,11 +49,9 @@ void WallClockApp::setup() {
 }
 
 void WallClockApp::updateBrightness() {
-    debugLCD(0, "==== ==== ==== ==== ", true);
     matrix->setBrightness(brightness);
-    sprintf(buf, "Brightness[0-15]:%    2d", brightness);
-    debugLCD(1, buf, false);
-    debugLCD(2, "==== ==== ==== ==== ", false);
+    sprintf(buf, "Brightness[0-15]:%2d", brightness);
+    debug(1, buf, false);
 }
 
 void WallClockApp::loop() {
@@ -78,7 +70,11 @@ void WallClockApp::loop() {
     }
     delay(10);
 }
-void WallClockApp::debugLCD(int row, const char *message, bool clear) {
+void WallClockApp::debug(const char *message) {
+    Serial.println(message);
+}
+
+void WallClockApp::debug(int row, const char *message, bool clear) {
     if (clear)
         lcd->clear();
     row = row % 4;
@@ -95,30 +91,35 @@ void WallClockApp::blinkLED() {
 }
 
 void WallClockApp::cb_DisplayTimeNow() {
-    if (!screenOn) return;
     tmElements_t tm;
     if (RTC.read(tm)) {
         short h = tm.Hour % 12;
         if (h == 0) { h = 12; }
+
         short m = tm.Minute;
-        displayTime(h, m);
+        if (screenOn) displayTime(h, m);
         sprintf(buf, "%2d:%02d:%02d %d/%02d/%d", h, m, tm.Second, tm.Month, tm.Day, 1970 + tm.Year);
         Serial.println(buf);
         lcd->setCursor(0,3);
         lcd->print(buf);
     } else {
-        matrix->printError();
-        Serial.println("Time chip not detected");
-        lcd->setCursor(0,1);
-        lcd->println("Time chip not detected");
-        colonOn = !colonOn;
-        matrix->drawColon(colonOn);
-        matrix->writeDisplay();
+        if (RTC.chipPresent()) {
+            Serial.println("RTC chip found, but not initialized. Setting to compile time.");
+            helper->setTimeToCompileTime();
+            return;
+        } else {
+            matrix->printError();
+            Serial.println("Time chip not detected");
+            lcd->setCursor(0,1);
+            lcd->println("Time chip not detected");
+            colonOn = !colonOn;
+        }
     }
+
 }
 /**
  * We receive negative hours or minutes when the other
- * element is being setup / modified.
+ * element is being setup / modified. A bit of nasty overloading, but hey. Whatever.
  */
 void WallClockApp::displayTime(signed short h, signed short m) {
     if (!screenOn) return;
@@ -156,13 +157,16 @@ void WallClockApp::cb_RotaryButtonClick() {
 void WallClockApp::cb_RotaryButtonDoubleClick() {
     if (mode != SetTime::Default) {
         mode = SetTime::Default;
-        debugLCD(0, "Cancel Setup", true);
+        debug(0, "Cancel Setup", true);
     }
     digitalWrite(config.pinLED, LOW);
 }
 void WallClockApp::cb_RotaryButtonHold() {
-    if (mode == SetTime::Default)
+    Serial.println("cb_RotaryButtonHold");
+    if (mode == SetTime::Default) {
+        printf("Mode is default, calling configureTime() on menu pointer %x", (int) menu);
         menu->configureTime();
+    }
 }
 
 void WallClockApp::cb_ToggleDisplay() {

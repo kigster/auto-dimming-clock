@@ -22,40 +22,54 @@
 #include <Adafruit_LEDBackpack.h>
 #include <Adafruit_GFX.h>
 #include <OneButton.h>
-
+#include "printf.h"
 #include "WallClock.h"
 #include "WallClockApp.h"
+#define br     Serial.println("")
 
-HardwareConfig config = {13, A0, 5, 3, 2, 4 };
+HardwareConfig config = {
+        13,     // LED
+        A0,     // Photo
+         5,     // Button
+         3,     // Right Rotary
+         2,     // Left Rotary
+         4 };   // Click Rotary
 
-WallClockApp app(config);
+WallClockApp *app;
 
 void rotaryButtonClick() {
-    app.cb_RotaryButtonClick();
+    app->cb_RotaryButtonClick();
 }
 void rotaryButtonDoubleClick() {
-    app.cb_RotaryButtonDoubleClick();
+    app->cb_RotaryButtonDoubleClick();
 }
 void rotaryButtonHold() {
-    app.cb_RotaryButtonHold();
+    Serial.println("rotaryButtonHold()");
+    app->cb_RotaryButtonHold();
 }
 void toggleDisplay() {
-    app.cb_ToggleDisplay();
+    app->cb_ToggleDisplay();
 }
 void displayTimeNow(int timerId) {
-    app.cb_DisplayTimeNow();
+    app->cb_DisplayTimeNow();
 }
 void readPhotoResistor(int timerId) {
-    app.cb_ReadPhotoResistor();
+    app->cb_ReadPhotoResistor();
 }
 
-
-
-
 void setup() {
-    app.setup();
+    Serial.begin(57600);
+    printf_begin();
+
+    printf("Creating Application instance...\n"); br;
+
+    app = new WallClockApp(config);
+    printf("Calling setup...\n"); br;
+
+    app->setup();
+    printf("Setup complete, entering loop.\n"); br;
 }
 
 void loop() {
-    app.loop();
+    app->loop();
 }

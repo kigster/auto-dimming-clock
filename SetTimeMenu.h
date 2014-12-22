@@ -21,15 +21,18 @@ class WallClockApp;
 class SetTimeMenu {
 public:
     SetTimeMenu(WallClockApp *app);
+    void configureTime() ;
+    void nextMode();
+private:
 
     signed short h, m;
     WallClockApp *app;
+    char *what;
 
-    void nextMode();
     void instructions();
-    void configureTime() ;
     void updateTimeCallback();
     void selectNumber(signed short *current, int min, int max);
+
 };
 
 #endif /* SETTIMEMENU_H_ */

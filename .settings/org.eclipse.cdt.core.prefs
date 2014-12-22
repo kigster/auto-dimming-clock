@@ -31,7 +31,7 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.ARCH/value=AVR
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.BOARD/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.BOARD/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.BOARD/value=AVR_PRO
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.BOARD/value=AVR_NANO
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.CORE/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.CORE/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.CORE/value=arduino
@@ -145,7 +145,7 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.CONFI
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.CONFIG.PATH/value=${A.TOOLS.AVRDUDE.CONFIG.PATH}
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.NAME/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.NAME/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.NAME/value=Arduino Pro or Pro Mini
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.NAME/value=Arduino Nano
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.PATH/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.PATH/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.PATH/value=${A.TOOLS.AVRDUDE.PATH}
@@ -310,10 +310,10 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.BOARDS_FILE/value=/Applications/Arduino 1.5.8.app/Contents/Java/hardware/arduino/avr/boards.txt
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.BOARD_NAME/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.BOARD_NAME/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.BOARD_NAME/value=Arduino Pro or Pro Mini
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.BOARD_NAME/value=Arduino Nano
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PORT/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PORT/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PORT/value=/dev/cu.usbserial-AH02MB22
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PORT/value=/dev/tty.usbserial-A9Y9TFJR
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PROGMR/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PROGMR/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PROGMR/value=Default
@@ -337,7 +337,7 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.PLATFORM_FILE/value=/Applications/Arduino 1.5.8.app/Contents/Java/hardware/arduino/avr/platform.txt
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.Processor/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.Processor/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.Processor/value=ATmega328 (5V, 16 MHz)
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.Processor/value=ATmega328
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.SIZE.SWITCH/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.SIZE.SWITCH/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.SIZE.SWITCH/value=${A.RECIPE.SIZE.PATTERN}

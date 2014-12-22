@@ -13,6 +13,7 @@
 SetTimeMenu::SetTimeMenu(WallClockApp *application) {
     app = application;
     h = m = 0;
+    what = "";
 }
 
 void SetTimeMenu::nextMode() {
@@ -20,15 +21,15 @@ void SetTimeMenu::nextMode() {
         app->mode = SetTime::Default;
     else
         app->mode = (SetTime::TimeMode) ((int) app->mode << 1);
+    printf("Mode Changed, new mode: %d", (int) app->mode);
 }
 void SetTimeMenu::instructions() {
-    app->debugLCD(2, "       Click to Save", false);
-    app->debugLCD(3, "     DblClck to Exit", false);
+    app->debug(2, "       Click to Save", false);
+    app->debug(3, "     DblClck to Exit", false);
 }
 
-char *what;
-
 void SetTimeMenu::configureTime() {
+    Serial.println("Entering setup...");
     app->blinkLED();
     nextMode();
     tmElements_t tm;
@@ -37,13 +38,13 @@ void SetTimeMenu::configureTime() {
         if (h == 0) { h = 12; }
         m = tm.Minute;
     } else {
-        app->debugLCD(0, "Can't read current time", true);
+        app->debug(0, "Can't ¨read current time", true);
         delay(5000);
         return;
     }
     switch (app->mode) {
     case SetTime::Hour:
-        app->debugLCD(0, "====== Setup =======", true);
+        app->debug(0, "====== Setup =======", true);
         instructions();
         what = (char *)"Hours";
         selectNumber(&h, 1, 12);
@@ -64,12 +65,12 @@ void SetTimeMenu::configureTime() {
         sprintf(app->buf, "New Time: %2d:%02d", h, m);
         Serial.print("Setting Time to: ");
         Serial.println(app->buf);
-        app->debugLCD(0, "Saving New Time...", true);
-        app->debugLCD(1, app->buf, false);
+        app->debug(0, "Saving New Time...", true);
+        app->debug(1, app->buf, false);
         if (RTC.write(tm)) {
-            app->debugLCD(3, "Success! :)", false);
+            app->debug(3, "Success! :)", false);
         } else {
-            app->debugLCD(3, "Error :(", false);
+            app->debug(3, "Error :(", false);
         }
         app->helper->setTimeTo(tm);
         nextMode();
@@ -107,7 +108,7 @@ void SetTimeMenu::selectNumber(signed short *current, int min, int max) {
                     (app->mode == SetTime::Minute ? m : -1)
                     );
             sprintf(app->buf, "%-7s: %2d:%02d", what, h, m);
-            app->debugLCD(1, app->buf, false);
+            app->debug(1, app->buf, false);
             delay(30);
         }
     }
