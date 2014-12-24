@@ -12,7 +12,6 @@
  *
  * Author: Konstantin Gredeskoul <kigster@gmail.com>
  */
-
 #include <RotaryEncoderWithButton.h>
 #include <SimpleTimer.h>
 #include <Wire.h>
@@ -21,55 +20,105 @@
 #include <DS1307RTC.h>
 #include <Adafruit_LEDBackpack.h>
 #include <Adafruit_GFX.h>
-#include <OneButton.h>
-#include "printf.h"
 #include "WallClock.h"
 #include "WallClockApp.h"
-#define br     Serial.println("")
 
 HardwareConfig config = {
-        13,     // LED
         A0,     // Photo
-         5,     // Button
-         3,     // Right Rotary
-         2,     // Left Rotary
-         4 };   // Click Rotary
+         3,     // Left Rotary
+         4,     // Right Rotary
+         5,     // Rotary Button
+         2      // NeoPixels
+};
 
 WallClockApp *app;
+SimpleTimer timer(1);
+
+#ifdef TEENSYDUINO
+time_t getTeensy3Time() {
+    return Teensy3Clock.get();
+}
+#endif
 
 void rotaryButtonClick() {
-    app->cb_RotaryButtonClick();
+    Serial.println("rotaryButtonClick()");
+    app->cb_ButtonClick();
+    delay(100);
 }
 void rotaryButtonDoubleClick() {
-    app->cb_RotaryButtonDoubleClick();
+    Serial.println("rotaryButtonDoubleClick()");
+    app->cb_ButtonDoubleClick();
+    delay(100);
 }
-void rotaryButtonHold() {
-    Serial.println("rotaryButtonHold()");
-    app->cb_RotaryButtonHold();
-}
-void toggleDisplay() {
-    app->cb_ToggleDisplay();
+void rotaryButtonLongPress() {
+    Serial.println("rotaryButtonLongPress()");
+    app->cb_ButtonHold();
+    delay(100);
 }
 void displayTimeNow(int timerId) {
-    app->cb_DisplayTimeNow();
+    app->displayCurrentTime();
 }
 void readPhotoResistor(int timerId) {
-    app->cb_ReadPhotoResistor();
+    app->getPhotoReading();
+}
+void neoPixelRefresh(int timerId) {
+    app->neoPixelRefresh();
+}
+void neoPixelNextEffect(int timerId) {
+    app->neoPixelNextEffect();
 }
 
 void setup() {
     Serial.begin(57600);
-    printf_begin();
-
-    printf("Creating Application instance...\n"); br;
-
+#ifdef TEENSYDUINO
+    setSyncProvider(getTeensy3Time);
+#endif
+    Serial.println("Clock-A-Roma v1.0");
     app = new WallClockApp(config);
-    printf("Calling setup...\n"); br;
 
+    Serial.println("Moving on to setup...");
     app->setup();
-    printf("Setup complete, entering loop.\n"); br;
+
+    Serial.println("Establishing callbacks...");
+    app->rotary->getButton()->attachClick(rotaryButtonClick);
+    app->rotary->getButton()->attachDoubleClick(rotaryButtonDoubleClick);
+    app->rotary->getButton()->attachLongPressStart(rotaryButtonLongPress);
+
+    timer.setInterval( 1000, displayTimeNow);
+    timer.setInterval(  200, readPhotoResistor);
+    timer.setInterval(10000, neoPixelNextEffect);
+    timer.setInterval(    5, neoPixelRefresh);
+
+    Serial.print("Checking time chip and current time... ");
+
+#ifdef ENABLE_SET_TIME
+#ifdef TEENSYDUINO
+    if (year() < 2014) {
+        Serial.println("[BLOOPERS!]");
+        Serial.print("Year returned is < 2014, resetting time to compile time, 12:00. Year: "); Serial.println(year());
+        app->helper->setDateToCompileTime();
+    } else {
+        Serial.println("[OK]");
+    }
+#else
+    tmElements_t tm;
+    bool rtcResult = RTC.read(tm);
+    if (RTC.chipPresent()) {
+        if (!rtcResult || tm.Year < 2014>)) {
+            Serial.print("Year returned is < 2014, resetting time.  Year: "); Serial.println(tm.Year);
+            app->helper->setDateToCompileTime();
+        }
+    } else {
+        Serial.println("RTC chip was not detected.")
+    }
+#endif /* TEENSYDUINO */
+#endif /* ENABLE_SET_TIME */
+    Serial.println("Setup complete, entering loop...");
 }
 
 void loop() {
-    app->loop();
+    timer.run();
+    app->rotary->tick();
+    app->adjustBrightness();
+    delay(10);
 }

@@ -9,9 +9,5 @@
  */
 
 
-void rotaryButtonClick();
-void rotaryButtonDoubleClick();
-void rotaryButtonHold();
-void toggleDisplay();
-void readPhotoResistor(int timerId);
-void displayTimeNow(int timerId);
+#define ENABLE_SET_TIME
+#define ENABLE_MENU

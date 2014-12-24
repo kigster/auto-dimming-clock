@@ -8,6 +8,8 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 
+#include "WallClock.h"
+#ifdef ENABLE_MENU
 
 #ifndef SETTIMEMENU_H_
 #define SETTIMEMENU_H_
@@ -28,7 +30,6 @@ private:
     signed short h, m;
     WallClockApp *app;
     char *what;
-
     void instructions();
     void updateTimeCallback();
     void selectNumber(signed short *current, int min, int max);
@@ -36,3 +37,4 @@ private:
 };
 
 #endif /* SETTIMEMENU_H_ */
+#endif /* ENABLE_MENU */

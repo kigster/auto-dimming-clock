@@ -25,7 +25,8 @@
 #include "SetTimeHelper.h"
 #include "SetTimeMenu.h"
 #include "WallClock.h"
-
+#include "neopixel/NeoPixelManager.h"
+#include "neopixel/NeoPixelEffects.h"
 namespace SetTime {
     typedef enum TimeChangeMode_e {
         Default     = (1 << 0),
@@ -37,49 +38,62 @@ namespace SetTime {
 }
 ;
 typedef struct hardwareConfig_s {
-    uint8_t pinLED;
     uint8_t pinPhotoResistor;
-    uint8_t pinRedButton;
     uint8_t pinRotaryLeft;
     uint8_t pinRotaryRight;
     uint8_t pinRotaryButton;
+    uint8_t pinNeoPixels;
 } HardwareConfig;
 
-
+#ifdef ENABLE_MENU
 class SetTimeMenu;
+#endif
 
 class WallClockApp {
 public:
     WallClockApp(HardwareConfig config);
 
-    OneButton *rotaryButton,    *redButton;
     Adafruit_7segment           *matrix;
-    RotaryEncoderWithButton     *rotary;
+#ifdef ENABLE_LCD
     LiquidCrystal_I2C           *lcd;  // set the LCD address to 0x27 for a 16 chars and 2 line display
-    SimpleTimer                 *timer;
+#endif
     SetTime::TimeMode           mode;
-    uint8_t                     brightness;
+#ifdef ENABLE_MENU
     SetTimeMenu                 *menu;
+#endif
+#ifdef ENABLE_SET_TIME
     SetTimeHelper               *helper;
-    char buf[30];
-    HardwareConfig config;
-    bool colonOn, screenOn;
+#endif
+    NeoPixelManager             *neoPixelManager;
+    RotaryEncoderWithButton     *rotary;
+    HardwareConfig              config;
+    char                        buffer[128];
 
     void setup();
-    void loop();
-    void updateBrightness();
-    void buttonClick();
+    void setBrightness(signed short brightnessValue);
+    uint8_t getBrightness();
+    void adjustBrightness();
+
     void displayTime(signed short h, signed short m);
-    void blinkLED();
+    void toggleDisplay();
+    void toggleNeoPixels();
+    void getPhotoReading();
+    void displayCurrentTime();
+    void neoPixelRefresh();
+    void neoPixelNextEffect();
+    // Callbacks
+    void cb_ButtonClick();
+    void cb_ButtonDoubleClick();
+    void cb_ButtonHold();
+
     void debug(int row, const char *message, bool clear);
     void debug(const char *message);
-    void cb_RotaryButtonClick();
-    void cb_RotaryButtonDoubleClick();
-    void cb_RotaryButtonHold();
-    void cb_ToggleDisplay();
-    void cb_ReadPhotoResistor();
-    void cb_DisplayTimeNow();
+
 private:
+    bool colonOn, screenOn, neoPixelsOn;
+    uint8_t brightness;
+    uint16_t lastPhotoReading;
+
 };
 
 #endif /* WALLCLOCKAPP_H_ */

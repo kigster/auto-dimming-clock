@@ -11,98 +11,98 @@
 #include "WallClockApp.h"
 #include <Arduino.h>
 
-
 WallClockApp::WallClockApp(HardwareConfig configuration) {
     config = configuration;
-    rotaryButton = new OneButton(config.pinRotaryButton, true);
-    redButton = new OneButton(config.pinRedButton, true);
     matrix = new Adafruit_7segment();
-    rotary = new RotaryEncoderWithButton(config.pinRotaryLeft, config.pinRotaryRight, config.pinRotaryButton);
+#ifdef ENABLE_LCD
     lcd = new LiquidCrystal_I2C(0x3F, 20, config.pinRotaryButton);
-    timer = new SimpleTimer(1);
+#endif
     screenOn = colonOn = true;
     mode = SetTime::Default;
-    helper = new SetTimeHelper();
+    neoPixelManager = new NeoPixelManager(3, config.pinNeoPixels);
+    rotary = new RotaryEncoderWithButton(config.pinRotaryLeft, config.pinRotaryRight, config.pinRotaryButton);
     brightness = 15;
+    neoPixelsOn = false;
+    lastPhotoReading = 0;
+#ifdef ENABLE_MENU
     menu = NULL;
+#endif
+#ifdef ENABLE_SET_TIME
+    helper = new SetTimeHelper();
+#endif
 }
 
 void WallClockApp::setup() {
-    menu = new SetTimeMenu(this);
-    pinMode(config.pinLED, OUTPUT);
-    pinMode(config.pinPhotoResistor, INPUT);
-    pinMode(config.pinRedButton, INPUT_PULLUP);
     matrix->begin(0x70);
-    rotary->begin();
+    matrix->clear();
+#ifdef ENABLE_MENU
+    if (!menu)
+        menu = new SetTimeMenu(this);
+#endif
+    pinMode(config.pinPhotoResistor, INPUT);
 
+#ifdef ENABLE_LCD
     lcd->init();
     // Print a message to the LCD.
     lcd->backlight();
     lcd->print("Clock-A-Roma v1.0");
-    rotaryButton->attachClick(rotaryButtonClick);
-    rotaryButton->attachDoubleClick(rotaryButtonDoubleClick);
-    rotaryButton->attachLongPressStop(rotaryButtonHold);
+#endif
 
-    redButton->attachClick(toggleDisplay);
-    timer->setInterval(1000, displayTimeNow);
-    timer->setInterval(1000, readPhotoResistor);
+    neoPixelManager->begin();
 }
 
-void WallClockApp::updateBrightness() {
-    matrix->setBrightness(brightness);
-    sprintf(buf, "Brightness[0-15]:%2d", brightness);
-    debug(1, buf, false);
+uint8_t WallClockApp::getBrightness() {
+    return brightness;
 }
 
-void WallClockApp::loop() {
-    timer->run();
-    rotaryButton->tick();
-    redButton->tick();
-
-    signed int delta = rotary->rotaryDelta();
-    if (abs(delta) > 1) {
-        delta = (delta > 0) ? 1 : -1;
-        brightness += delta;
-        if (brightness < 0) brightness = 0;
-        if (brightness > 15) brightness = 15;
-        updateBrightness();
-        delay(20);
+void WallClockApp::adjustBrightness() {
+    signed short delta = rotary->delta();
+    if (delta != 0) {
+        setBrightness((signed short) getBrightness() + delta);
     }
-    delay(10);
 }
+
+void WallClockApp::setBrightness(signed short brightnessValue) {
+    if (brightnessValue > 15) brightnessValue = 15;
+    if (brightnessValue < 0) brightnessValue = 0;
+    brightness = brightnessValue;
+    matrix->setBrightness(brightness);
+    sprintf(buffer, "Brightness[0-15]:%2d", brightness);
+    debug(1, buffer, false);
+}
+
+void WallClockApp::neoPixelRefresh() {
+    if (neoPixelsOn)
+        neoPixelManager->refreshEffect();
+}
+void WallClockApp::neoPixelNextEffect() {
+    if (neoPixelsOn)
+        neoPixelManager->nextEffect();
+}
+
 void WallClockApp::debug(const char *message) {
     Serial.println(message);
 }
 
 void WallClockApp::debug(int row, const char *message, bool clear) {
+#ifdef ENABLE_LCD
     if (clear)
         lcd->clear();
     row = row % 4;
     lcd->setCursor(0, row);
     lcd->print(message);
+#endif
     Serial.println(message);
 }
 
-void WallClockApp::blinkLED() {
-    digitalWrite(config.pinLED, HIGH);
-    digitalWrite(config.pinLED, LOW);
-    delay(100);
-    digitalWrite(config.pinLED, HIGH);
-}
 
-void WallClockApp::cb_DisplayTimeNow() {
+void WallClockApp::displayCurrentTime() {
     tmElements_t tm;
-    if (RTC.read(tm)) {
-        short h = tm.Hour % 12;
-        if (h == 0) { h = 12; }
-
-        short m = tm.Minute;
-        if (screenOn) displayTime(h, m);
-        sprintf(buf, "%2d:%02d:%02d %d/%02d/%d", h, m, tm.Second, tm.Month, tm.Day, 1970 + tm.Year);
-        Serial.println(buf);
-        lcd->setCursor(0,3);
-        lcd->print(buf);
-    } else {
+    short h, m;
+#ifdef TEENSYDUINO
+    breakTime(now(), tm);
+#else
+    if (!RTC.read(tm)) {
         if (RTC.chipPresent()) {
             Serial.println("RTC chip found, but not initialized. Setting to compile time.");
             helper->setTimeToCompileTime();
@@ -113,16 +113,27 @@ void WallClockApp::cb_DisplayTimeNow() {
             lcd->setCursor(0,1);
             lcd->println("Time chip not detected");
             colonOn = !colonOn;
+            return;
         }
     }
-
+#endif
+    h = tm.Hour % 12;
+    if (h == 0) { h = 12; }
+    m = tm.Minute;
+    if (screenOn) displayTime(h, m);
+    sprintf(buffer, "%2d:%02d:%02d %d/%02d/%d", h, m, tm.Second, tm.Month, tm.Day, 1970 + tm.Year);
+    Serial.println(buffer);
+#ifdef ENABLE_LCD
+    lcd->setCursor(0,3);
+    lcd->print(buffer);
+#endif
 }
 /**
  * We receive negative hours or minutes when the other
  * element is being setup / modified. A bit of nasty overloading, but hey. Whatever.
  */
 void WallClockApp::displayTime(signed short h, signed short m) {
-    if (!screenOn) return;
+    if (!screenOn && h >= 0 && m >= 0) return;
     matrix->clear();
     colonOn = !colonOn;
     if (h < 0 || m < 0) colonOn = false;
@@ -140,41 +151,81 @@ void WallClockApp::displayTime(signed short h, signed short m) {
     matrix->writeDisplay();
 }
 
-void WallClockApp::cb_ReadPhotoResistor() {
-    int v = analogRead(config.pinPhotoResistor);
+void WallClockApp::getPhotoReading() {
+
+    uint16_t v = analogRead(config.pinPhotoResistor);
+    if (lastPhotoReading == 0) {
+        lastPhotoReading = v;
+        return;
+    }
+
+    signed long delta = 8 * (v - lastPhotoReading) / 1024; // convert to brightness
+    if (delta != 0) {
+        Serial.print("PhotoResistor reading is: ");
+        Serial.print(v);
+        Serial.print(". Changing brightness from "); Serial.print(brightness);
+        Serial.print(" to "); Serial.println(delta);
+        setBrightness(brightness + delta);
+    }
+
+    lastPhotoReading = v;
+#ifdef ENABLE_LCD
     lcd->setCursor(0,2);
     lcd->print("Photo Value: ");
-    sprintf(buf, "%4d", v);
-    lcd->print(buf);
+    sprintf(buffer, "%4d", v);
+    lcd->print(buffer);
+#endif
 }
 
-void WallClockApp::cb_RotaryButtonClick() {
+void WallClockApp::cb_ButtonClick() {
+    Serial.print("Entering WallClockApp::cb_ButtonClick, mode = ");
+    Serial.println((int) mode);
     if (mode != SetTime::Default) {
+#ifdef ENABLE_MENU
         menu->nextMode();
+#endif
+    } else {
+        toggleNeoPixels();
     }
 }
 
-void WallClockApp::cb_RotaryButtonDoubleClick() {
+void WallClockApp::cb_ButtonDoubleClick() {
     if (mode != SetTime::Default) {
         mode = SetTime::Default;
         debug(0, "Cancel Setup", true);
-    }
-    digitalWrite(config.pinLED, LOW);
-}
-void WallClockApp::cb_RotaryButtonHold() {
-    Serial.println("cb_RotaryButtonHold");
-    if (mode == SetTime::Default) {
-        printf("Mode is default, calling configureTime() on menu pointer %x", (int) menu);
-        menu->configureTime();
+    } else {
+        toggleDisplay();
     }
 }
 
-void WallClockApp::cb_ToggleDisplay() {
+void WallClockApp::cb_ButtonHold() {
+    Serial.print("Entering WallClockApp::cb_ButtonHold, mode = ");
+    Serial.println((int) mode);
+    if (mode == SetTime::Default) {
+        Serial.println("Mode is Default -> calling configureTime()");
+        if (menu)
+            menu->configureTime();
+        else
+            Serial.println("Whoops, menu point is NULL!!");
+    } else {
+        Serial.println("Mode is not Default, Hold is ignored.");
+    }
+}
+
+void WallClockApp::toggleNeoPixels() {
+    neoPixelsOn = !neoPixelsOn;
+    if (neoPixelsOn) {
+        neoPixelManager->nextEffect();
+    } else {
+        neoPixelManager->shutoff();
+    }
+}
+void WallClockApp::toggleDisplay() {
     screenOn = !screenOn;
     matrix->clear();
     matrix->writeDisplay();
     if (screenOn) {
-        displayTimeNow(0);
+        displayCurrentTime();
     }
 }
 

@@ -7,8 +7,10 @@
  *
  *  (c) 2014 All rights reserved, MIT License.
  */
-
 #include "SetTimeHelper.h"
+#include "WallClock.h"
+
+#ifdef ENABLE_SET_TIME
 
 #include <Time.h>
 #include <Arduino.h>
@@ -24,7 +26,7 @@ SetTimeHelper::SetTimeHelper() {
 
 }
 
-bool SetTimeHelper::setTimeToCompileTime() {
+bool SetTimeHelper::setDateToCompileTime() {
     // get the date and time the compiler was run
     if (getCompileDate() && getCompileTime()) {
         // and configure the RTC with this info
@@ -66,12 +68,20 @@ bool SetTimeHelper::getCompileDate() {
 }
 
 bool SetTimeHelper::setTimeTo(tmElements_t tm) {
-    time_t compileTime = makeTime(tm);
-    setTime(compileTime);
+    time_t timeToSet = makeTime(tm);
+    setTime(timeToSet);
+#ifdef TEENSYDUINO
+    time_t t = makeTime(tm);
+    Teensy3Clock.set(t);
+    setTime(t);
+    return true;
+#else
     if (RTC.write(tm)) {
         return true;
     } else {
         return true;
     }
+#endif
 }
 
+#endif

@@ -8,6 +8,9 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 
+#include "WallClock.h"
+
+#ifdef ENABLE_SET_TIME
 
 #ifndef TEENSYTIMEMANAGER_H_
 #define TEENSYTIMEMANAGER_H_
@@ -20,7 +23,7 @@ typedef void(*timeCallback)(tmElements_t);
 class SetTimeHelper {
 public:
     SetTimeHelper();
-    bool setTimeToCompileTime();
+    bool setDateToCompileTime();
     bool setTimeTo(uint8_t h, uint8_t m);
     bool setTimeTo(tmElements_t tm);
 
@@ -32,4 +35,4 @@ private:
 };
 
 #endif /* TIMEMANAGER_H_ */
-
+#endif /* ENABLE_SET_TIME */
