@@ -46,7 +46,7 @@ Additional dependencies:
 * [RotaryEncoderWithButton](https://github.com/kigster/kiguino/tree/master/arduino/libraries/RotaryEncoderWithButton)
 * [OneButton](https://github.com/mathertel/OneButton)
 
-![Clock Top View](images/clock_top_.jpg)
+![Clock Top View](images/clock_top.jpg)
 
 
 Author
