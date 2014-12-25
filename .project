@@ -27,9 +27,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>Libraries/Adafruit-LED-Backpack-Library</name>
+			<name>Libraries/Adafruit-LED-Backpack</name>
 			<type>2</type>
-			<locationURI>ArduinoPivateLibPath/Adafruit-LED-Backpack-Library</locationURI>
+			<locationURI>ArduinoPivateLibPath/Adafruit-LED-Backpack</locationURI>
 		</link>
 		<link>
 			<name>Libraries/Adafruit_GFX</name>
@@ -52,9 +52,9 @@
 			<locationURI>ArduinoHardwareLibPath/Encoder</locationURI>
 		</link>
 		<link>
-			<name>Libraries/LiquidCrystal_I2C2004V1</name>
+			<name>Libraries/LiquidCrystal_I2C</name>
 			<type>2</type>
-			<locationURI>ArduinoPivateLibPath/LiquidCrystal_I2C2004V1</locationURI>
+			<locationURI>ArduinoPivateLibPath/LiquidCrystal_I2C</locationURI>
 		</link>
 		<link>
 			<name>Libraries/OneButton</name>
