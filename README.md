@@ -10,10 +10,12 @@ Overview
 
 The clock is equipped with:
 
-* light sensor (beneath the rotary knob)
+* light sensor (beneath the rotary knob) which automatically adjust brightness by up to 50% in either direction, depending on the light around (it is attached to a 10K resistor).
 * rotary knob with a built-in button functionality
-* neo pixels
-* Adafruit 7-segment I2C display
+* 3 x neo pixels
+* Adafruit 7-segment I2C display for the time
+
+The enclosure you see on the picture is made from 1/8" acrylic using matte black color, and semi-transparent black for the front panel.
 
 ![Clock Front View](images/clock_front.jpg)
 
