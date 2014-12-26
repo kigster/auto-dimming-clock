@@ -1,9 +1,11 @@
-WallClock
+Just imagine, the
+
+Digital Clock for your Bed
 =========
 
-Digital bed-side clock with a rotary encoder knob (with a button), and a strip of 3 neo pixels illuminating your mid-sleep bathroom trip in pretty colors. Built using Teensy, which is an Arduino compatible board with much more power, memory, etc. 
+with a rotary encoder knob (the type that also has  a button), and a strip of 3 neo pixels illuminating your mid-sleep bathroom trip in pretty colors! Now that's life.  
 
-Yes, teensy is probably an overkill for this project, but it does provide some interesting options in the future – bottom of the clock provides access to Teensy's USB port, it is pretty easy to hook the clock to a computer running Arduino wtih AVR build tool chain. This project folder maps to an Exclipse rpeoje
+The clock is powered by Arduino-compatible, but much more powerful [Teensy 3.1](https://www.pjrc.com/teensy/teensy31.html). Yes, teensy is probably an overkill for this project, but it does provide some interesting options for reprogramming this clock in the future. There is a way to access Teensy's USB port, and so it is pretty easy to hook the clock to a computer running Arduino with an AVR build tool chain and update the source. This project folder maps to an Eclipse project, as I use Eclipse Arduino excension retrofitted to work with Teensy.
 
 Overview
 =============
@@ -12,8 +14,8 @@ The clock is equipped with:
 
 * light sensor (beneath the rotary knob) which automatically adjust brightness by up to 50% in either direction, depending on the light around (it is attached to a 10K resistor).
 * rotary knob with a built-in button functionality
-* 3 x neo pixels
-* Adafruit 7-segment I2C display for the time
+* 3 "neo pixel" RGB LEDs
+* Adafruit 7-segment I2C display for the time display
 
 The enclosure you see on the picture is made from 1/8" acrylic using matte black color, and semi-transparent black for the front panel.
 
