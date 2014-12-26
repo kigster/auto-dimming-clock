@@ -7,13 +7,13 @@
  *
  *  (c) 2014 All rights reserved, MIT License.
  */
-#include "WallClock.h"
+#include "BedTime.h"
 #ifdef ENABLE_MENU
 
 
 #include "SetTimeMenu.h"
 
-SetTimeMenu::SetTimeMenu(WallClockApp *application) {
+SetTimeMenu::SetTimeMenu(BedTimeApp *application) {
     app = application;
     h = m = 0;
     what = "";
@@ -74,7 +74,7 @@ void SetTimeMenu::configureTime() {
         app->debug(0, "Saving New Time...", true);
         app->debug(1, app->buffer, false);
         app->debug(3, "Success! :)", false);
-        app->helper->setTimeTo(tm);
+        app->helper.setTimeTo(tm);
         nextMode();
         delay(2000);
         /* no break */

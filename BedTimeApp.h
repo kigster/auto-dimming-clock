@@ -1,5 +1,5 @@
 /*
- * WallClockApp.h
+ * BedTimeApp.h
  *
  *  Created on: Dec 19, 2014
  *      Author: Konstantin Gredeskoul
@@ -8,8 +8,8 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 
-#ifndef WALLCLOCKAPP_H_
-#define WALLCLOCKAPP_H_
+#ifndef BEDTIMEAPP_H_
+#define BEDTIMEAPP_H_
 
 #include <Arduino.h>
 #include <RotaryEncoderWithButton.h>
@@ -24,7 +24,7 @@
 #include <OneButton.h>
 #include "SetTimeHelper.h"
 #include "SetTimeMenu.h"
-#include "WallClock.h"
+#include "BedTime.h"
 #include "neopixel/NeoPixelManager.h"
 #include "neopixel/NeoPixelEffects.h"
 namespace SetTime {
@@ -49,15 +49,15 @@ typedef struct hardwareConfig_s {
 class SetTimeMenu;
 #endif
 
-class WallClockApp {
+class BedTimeApp {
 public:
-    WallClockApp(HardwareConfig config);
+    BedTimeApp(HardwareConfig config);
 
     Adafruit_7segment           matrix;
+    SetTime::TimeMode           mode;
 #ifdef ENABLE_LCD
     LiquidCrystal_I2C           *lcd;  // set the LCD address to 0x27 for a 16 chars and 2 line display
 #endif
-    SetTime::TimeMode           mode;
 #ifdef ENABLE_MENU
     SetTimeMenu                 *menu;
 #endif
@@ -96,4 +96,4 @@ private:
 
 };
 
-#endif /* WALLCLOCKAPP_H_ */
+#endif /* BEDTIMEAPP_H_ */

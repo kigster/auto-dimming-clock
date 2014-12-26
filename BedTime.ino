@@ -1,5 +1,5 @@
 /*
- * WallClock
+ * BedTime
  *
  * 7-Segment Display for current time, based on the RTC chip.
  *
@@ -20,8 +20,11 @@
 #include <DS1307RTC.h>
 #include <Adafruit_LEDBackpack.h>
 #include <Adafruit_GFX.h>
-#include "WallClock.h"
-#include "WallClockApp.h"
+#include <OneButton.h>
+
+
+#include "BedTime.h"
+#include "BedTimeApp.h"
 
 HardwareConfig config = {
         A0,     // Photo
@@ -30,7 +33,7 @@ HardwareConfig config = {
          5,     // Rotary Button
          2      // NeoPixels
 };
-WallClockApp app(config);
+BedTimeApp app(config);
 SimpleTimer timer(1);
 
 #ifdef TEENSYDUINO

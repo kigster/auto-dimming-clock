@@ -10,11 +10,10 @@
 
 #ifndef NEOPIXELEFFECTS_H_
 #define NEOPIXELEFFECTS_H_
+
 #include <Adafruit_NeoPixel.h>
 
 #define MAX_EFFECTS 20
-
-
 
 class NeoPixelEffects {
 public:

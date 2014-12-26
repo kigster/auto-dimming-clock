@@ -1,5 +1,5 @@
 /*
- * WallClockApp.cpp
+ * BedTimeApp.cpp
  *
  *  Created on: Dec 19, 2014
  *      Author: Konstantin Gredeskoul
@@ -8,10 +8,10 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 
-#include "WallClockApp.h"
+#include "BedTimeApp.h"
 #include <Arduino.h>
 
-WallClockApp::WallClockApp(HardwareConfig configuration) {
+BedTimeApp::BedTimeApp(HardwareConfig configuration) {
     config = configuration;
 #ifdef ENABLE_LCD
     lcd = new LiquidCrystal_I2C(0x3F, 20, config.pinRotaryButton);
@@ -26,12 +26,9 @@ WallClockApp::WallClockApp(HardwareConfig configuration) {
 #ifdef ENABLE_MENU
     menu = NULL;
 #endif
-#ifdef ENABLE_SET_TIME
-//    helper = new SetTimeHelper();
-#endif
 }
 
-void WallClockApp::setup() {
+void BedTimeApp::setup() {
     matrix.begin(0x70);
     matrix.clear();
     matrix.writeDisplay();
@@ -52,18 +49,18 @@ void WallClockApp::setup() {
     neoPixelManager->begin();
 }
 
-uint8_t WallClockApp::getBrightness() {
+uint8_t BedTimeApp::getBrightness() {
     return brightness;
 }
 
-void WallClockApp::adjustBrightness() {
+void BedTimeApp::adjustBrightness() {
     signed short delta = rotary->delta();
     if (delta != 0) {
         setBrightness((signed short) getBrightness() + delta);
     }
 }
 
-void WallClockApp::setBrightness(signed short brightnessValue) {
+void BedTimeApp::setBrightness(signed short brightnessValue) {
     if (brightnessValue > 15) brightnessValue = 15;
     if (brightnessValue < 0) brightnessValue = 0;
     brightness = brightnessValue;
@@ -72,20 +69,20 @@ void WallClockApp::setBrightness(signed short brightnessValue) {
     debug(1, buffer, false);
 }
 
-void WallClockApp::neoPixelRefresh() {
+void BedTimeApp::neoPixelRefresh() {
     if (neoPixelsOn)
         neoPixelManager->refreshEffect();
 }
-void WallClockApp::neoPixelNextEffect() {
+void BedTimeApp::neoPixelNextEffect() {
     if (neoPixelsOn)
         neoPixelManager->nextEffect();
 }
 
-void WallClockApp::debug(const char *message) {
+void BedTimeApp::debug(const char *message) {
     Serial.println(message);
 }
 
-void WallClockApp::debug(int row, const char *message, bool clear) {
+void BedTimeApp::debug(int row, const char *message, bool clear) {
 #ifdef ENABLE_LCD
     if (clear)
         lcd->clear();
@@ -97,7 +94,7 @@ void WallClockApp::debug(int row, const char *message, bool clear) {
 }
 
 
-void WallClockApp::displayCurrentTime() {
+void BedTimeApp::displayCurrentTime() {
     tmElements_t tm;
     short h, m;
 #ifdef TEENSYDUINO
@@ -133,7 +130,7 @@ void WallClockApp::displayCurrentTime() {
  * We receive negative hours or minutes when the other
  * element is being setup / modified. A bit of nasty overloading, but hey. Whatever.
  */
-void WallClockApp::displayTime(signed short h, signed short m) {
+void BedTimeApp::displayTime(signed short h, signed short m) {
     if (!screenOn && h >= 0 && m >= 0) return;
     matrix.clear();
     colonOn = !colonOn;
@@ -152,7 +149,7 @@ void WallClockApp::displayTime(signed short h, signed short m) {
     matrix.writeDisplay();
 }
 
-void WallClockApp::getPhotoReading() {
+void BedTimeApp::getPhotoReading() {
 
     uint16_t v = analogRead(config.pinPhotoResistor);
     if (lastPhotoReading == 0) {
@@ -178,8 +175,8 @@ void WallClockApp::getPhotoReading() {
 #endif
 }
 
-void WallClockApp::cb_ButtonClick() {
-    Serial.print("Entering WallClockApp::cb_ButtonClick, mode = ");
+void BedTimeApp::cb_ButtonClick() {
+    Serial.print("Entering BedTimeApp::cb_ButtonClick, mode = ");
     Serial.println((int) mode);
     if (mode != SetTime::Default) {
 #ifdef ENABLE_MENU
@@ -190,7 +187,7 @@ void WallClockApp::cb_ButtonClick() {
     }
 }
 
-void WallClockApp::cb_ButtonDoubleClick() {
+void BedTimeApp::cb_ButtonDoubleClick() {
     if (mode != SetTime::Default) {
         mode = SetTime::Default;
         debug(0, "Cancel Setup", true);
@@ -199,8 +196,8 @@ void WallClockApp::cb_ButtonDoubleClick() {
     }
 }
 
-void WallClockApp::cb_ButtonHold() {
-    Serial.print("Entering WallClockApp::cb_ButtonHold, mode = ");
+void BedTimeApp::cb_ButtonHold() {
+    Serial.print("Entering BedTimeApp::cb_ButtonHold, mode = ");
     Serial.println((int) mode);
     if (mode == SetTime::Default) {
         Serial.println("Mode is Default -> calling configureTime()");
@@ -213,7 +210,7 @@ void WallClockApp::cb_ButtonHold() {
     }
 }
 
-void WallClockApp::toggleNeoPixels() {
+void BedTimeApp::toggleNeoPixels() {
     neoPixelsOn = !neoPixelsOn;
     if (neoPixelsOn) {
         neoPixelManager->nextEffect();
@@ -221,7 +218,7 @@ void WallClockApp::toggleNeoPixels() {
         neoPixelManager->shutoff();
     }
 }
-void WallClockApp::toggleDisplay() {
+void BedTimeApp::toggleDisplay() {
     screenOn = !screenOn;
     matrix.clear();
     matrix.writeDisplay();

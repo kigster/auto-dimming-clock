@@ -8,7 +8,7 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 
-#include "WallClock.h"
+#include "BedTime.h"
 #ifdef ENABLE_MENU
 
 #ifndef SETTIMEMENU_H_
@@ -16,19 +16,19 @@
 
 #include <Arduino.h>
 #include <DS1307RTC.h>
-#include "WallClockApp.h"
+#include "BedTimeApp.h"
 
-class WallClockApp;
+class BedTimeApp;
 
 class SetTimeMenu {
 public:
-    SetTimeMenu(WallClockApp *app);
+    SetTimeMenu(BedTimeApp *app);
     void configureTime() ;
     void nextMode();
 private:
 
     signed short h, m;
-    WallClockApp *app;
+    BedTimeApp *app;
     char *what;
     void instructions();
     void updateTimeCallback();
