@@ -3,7 +3,9 @@
  *
  * 7-Segment Display for current time, based on the RTC chip.
  *
- * Rotary encoder is used to set the time.
+ * Rotary encoder is used to change brightness, and set time. The button
+ * on rotary encoder is used in single click, double click and hold capacity
+ * for various options. See README for more info.
  *
  * Press and hold to enter configuration menu, then click to advance
  * to the next.
