@@ -52,6 +52,15 @@ Additional dependencies:
 
 ![Clock Top View](images/clock_top.jpg)
 
+Hardware
+========
+
+If there is interest, I can describe in more detail how the hardware is put together, so please create an issue on github to register your interest.
+
+For the time being, here is a high zoom shot into the land of wires and neatly arranged pieces :)
+
+![Clock Inside View](images/clock_inside.jpg)
+
 
 Author
 ======
