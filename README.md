@@ -5,7 +5,7 @@ Digital Clock for your Bed
 
 with a rotary encoder knob (the type that also has  a button), and a strip of 3 neo pixels illuminating your mid-sleep bathroom trip in pretty colors! Now that's life.  
 
-The clock is powered by Arduino-compatible, but much more powerful [Teensy 3.1](https://www.pjrc.com/teensy/teensy31.html). Yes, teensy is probably an overkill for this project, but it does provide some interesting options for reprogramming this clock in the future. There is a way to access Teensy's USB port, and so it is pretty easy to hook the clock to a computer running Arduino with an AVR build tool chain and update the source. This project folder maps to an Eclipse project, as I use Eclipse Arduino excension retrofitted to work with Teensy.
+The clock is powered by Arduino-compatible, but much more powerful [Teensy 3.1](https://www.pjrc.com/teensy/teensy31.html). Yes, teensy is probably an overkill for this project, but it does provide some interesting options for reprogramming this clock in the future. There is a way to access Teensy's USB port, and so it is pretty easy to hook the clock to a computer running Arduino with an AVR build tool chain and update the source. This project folder maps to an Eclipse project, as I use Eclipse Arduino extension, retrofitted to work with Teensy.
 
 Overview
 =============
