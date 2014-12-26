@@ -1,9 +1,9 @@
 WallClock
 =========
 
-Teensy-based digital clock with rotary encoder button used to set time, and neo-pixels for the fun of it :)
+Digital bed-side clock with a rotary encoder knob (with a button), and a strip of 3 neo pixels illuminating your mid-sleep bathroom trip in pretty colors. Built using Teensy, which is an Arduino compatible board with much more power, memory, etc. 
 
-Yes, teensy is probably an overkill for this project, but it does provide some interesting options in the future.
+Yes, teensy is probably an overkill for this project, but it does provide some interesting options in the future – bottom of the clock provides access to Teensy's USB port, it is pretty easy to hook the clock to a computer running Arduino wtih AVR build tool chain. This project folder maps to an Exclipse rpeoje
 
 Overview
 =============
@@ -25,8 +25,8 @@ Functionality
 When the switch turns on, the clock is on.  The time is stored on Teensy backed by a 3.3V battery, and uses a crystal soldered on the bottom of Teensy.
 
 When the clock is running, you can:
-* single click rotary knob turns on/off neo pixel strip
-* double click rotary knob turns off/on 7-segment display
+* Press single click rotary knob turns on/off neo pixel strip
+* Press double click rotary knob turns off/on 7-segment display
 * moving rotary knob in this mode changes the brightness. There are 16 total values for brightness, from 0 to 15.
 * press and hold enters the menu to set the time
   * Once in the menu setup, rotating the knob changes the current hour.  When done, click the knob once.
