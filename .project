@@ -42,6 +42,11 @@
 			<locationURI>ArduinoHardwareLibPath/Adafruit_NeoPixel</locationURI>
 		</link>
 		<link>
+			<name>Libraries/AwesomeTimer</name>
+			<type>2</type>
+			<locationURI>ArduinoPivateLibPath/AwesomeTimer</locationURI>
+		</link>
+		<link>
 			<name>Libraries/DS1307RTC</name>
 			<type>2</type>
 			<locationURI>ArduinoHardwareLibPath/DS1307RTC</locationURI>

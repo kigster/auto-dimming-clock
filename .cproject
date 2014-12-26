@@ -20,7 +20,7 @@
 							<tool id="it.baeyens.arduino.tool.sketch.compiler.cpp.1091958886" name="Arduino C++ Compiler" superClass="it.baeyens.arduino.tool.sketch.compiler.cpp">
 								<option id="it.baeyens.arduino.compiler.cpp.sketch.option.incpath.1318408181" name="Include Paths (-I)" superClass="it.baeyens.arduino.compiler.cpp.sketch.option.incpath" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/arduino/core}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Adafruit-GFX-Library}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Adafruit_GFX}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Adafruit-LED-Backpack-Library}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Encoder}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Encoder/utility}&quot;"/>
@@ -33,17 +33,13 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/LiquidCrystal_I2C2004V1}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/DS1307RTC}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Adafruit_NeoPixel}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Adafruit_GFX}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Adafruit-LED-Backpack}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/LiquidCrystal_I2C}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/AwesomeTimer}&quot;"/>
 								</option>
 								<inputType id="it.baeyens.arduino.compiler.cpp.sketch.input.679939265" name="CPP source files" superClass="it.baeyens.arduino.compiler.cpp.sketch.input"/>
 							</tool>
 							<tool id="it.baeyens.arduino.tool.compiler.c.1552101600" name="Arduino C Compiler" superClass="it.baeyens.arduino.tool.compiler.c">
 								<option id="it.baeyens.arduino.compiler.c.sketch.option.incpath.63322243" name="Include Paths (-I)" superClass="it.baeyens.arduino.compiler.c.sketch.option.incpath" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/arduino/core}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Adafruit-GFX-Library}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Adafruit-LED-Backpack-Library}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Encoder}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Encoder/utility}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/OneButton}&quot;"/>
@@ -58,6 +54,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Adafruit_GFX}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/Adafruit-LED-Backpack}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/LiquidCrystal_I2C}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WallClock/Libraries/AwesomeTimer}&quot;"/>
 								</option>
 								<inputType id="it.baeyens.arduino.compiler.c.sketch.input.446528251" name="C Source Files" superClass="it.baeyens.arduino.compiler.c.sketch.input"/>
 							</tool>
