@@ -16,18 +16,12 @@ NeoPixelEffects::NeoPixelEffects(Adafruit_NeoPixel *strip) {
     _numEffectsEnabled = 0;
     _currentEffectIndex = 0;
     _currentEffect = NULL;
-    i = 0;
-    j = 0;
+    reset();
 
     void (NeoPixelEffects::*allEffects[])() = {
-//        &NeoPixelEffects::colorWipeRed,
-//        &NeoPixelEffects::colorWipeBlue,
-//        &NeoPixelEffects::colorWipeGreen,
-//        &NeoPixelEffects::theaterChaseYellow,
-//        &NeoPixelEffects::theaterChaseRed,
-//        &NeoPixelEffects::theaterChaseBlue,
+//        &NeoPixelEffects::theaterChaseRainbow,
 //        &NeoPixelEffects::randomColor,
-//        &NeoPixelEffects::rainbow,
+        &NeoPixelEffects::rainbow,
         &NeoPixelEffects::rainbowCycle,
         NULL
     };
@@ -38,6 +32,12 @@ NeoPixelEffects::NeoPixelEffects(Adafruit_NeoPixel *strip) {
     }
     _numEffectsEnabled %= MAX_EFFECTS;
     chooseNewEffect();
+}
+
+void NeoPixelEffects::reset() {
+    i = 0;
+    j = 0;
+    flag = false;
 }
 
 void NeoPixelEffects::chooseNewEffect() {
@@ -60,6 +60,49 @@ int NeoPixelEffects::currentEffectIndex() {
 void NeoPixelEffects::refreshCurrentEffect() {
     if (effectsEnabled() > 0 && _currentEffect != NULL) {
         (this->*((NeoPixelEffects*) this)->NeoPixelEffects::_currentEffect)();
+    }
+}
+void NeoPixelEffects::fadeCycle() {
+    const static int max = 127;
+    signed int r, g, b;
+    if (i > max) {
+        flag = true;
+        i = 0;
+    }
+    r = (flag) ? i : -i;
+    g = (flag) ? i - max / 2 : max / 2 - i;
+    b = (flag) ? i - max : max - i;
+    if (r < 0) r = 0;
+    if (g < 0) g = 0;
+    if (b < 0) b = 0;
+    _strip->setPixelColor(j, _strip->Color(r,g,b));
+    _strip->show();
+    i++;
+    if (i > max && flag) {
+        i = 0;
+        flag = false;
+        j++;
+        j = j % 3;
+    }
+}
+
+void NeoPixelEffects::fadeOut(long millis) {
+    int delayTime = millis / 256;
+    uint8_t r, g, b;
+    for (i = 255; i >= 0; i--) {
+        for (int p = 0; p < _strip->numPixels(); p++) {
+            uint32_t c = _strip->getPixelColor(p);
+            r = (uint8_t)(c >> 16);
+            g = (uint8_t)(c >>  8);
+            b = (uint8_t) c;
+            if (r > 0) r--;
+            if (g > 0) g--;
+            if (b > 0) b--;
+            _strip->setPixelColor(p, _strip->Color(r,g,b));
+        }
+        _strip->show();
+        if ((r + g + b) == 0) break;
+        delay(delayTime);
     }
 }
 void NeoPixelEffects::randomColor() {
@@ -121,13 +164,13 @@ void NeoPixelEffects::rainbowCycle() {
 }
 
 void NeoPixelEffects::theaterChase(uint32_t c) {
-    for (int p = 0; p < _strip->numPixels(); p = p + 2) {
-        _strip->setPixelColor(p + i, c);    //turn every third pixel on
+    for (int p = 0; p < _strip->numPixels()*2; p = p + 2) {
+        _strip->setPixelColor((p) % _strip->numPixels(), c);    //turn every third pixel on
+    }
+    for (int p = 1; p < _strip->numPixels()*2; p = p + 2) {
+        _strip->setPixelColor((p) % _strip->numPixels(), 0);    //turn every third pixel off
     }
     _strip->show();
-    for (int p = 1; p < _strip->numPixels(); p = p + 2) {
-        _strip->setPixelColor(p + j, 0);    //turn every third pixel off
-    }
     j++;
     j %= 10;
     i++;
@@ -136,18 +179,18 @@ void NeoPixelEffects::theaterChase(uint32_t c) {
 
 //Theatre-style crawling lights with rainbow effect
 void NeoPixelEffects::theaterChaseRainbow() {
-    for (int p = 0; p < _strip->numPixels(); p = p + 3) {
-        _strip->setPixelColor(p + i, Wheel((p + j) % 255)); //turn every third pixel on
+    uint32_t c = Wheel(j % 255);
+    for (int p = 0; p < _strip->numPixels()*2; p = p + 2) {
+        _strip->setPixelColor((p) % _strip->numPixels(), c);    //turn every third pixel on
+    }
+    for (int p = 1; p < _strip->numPixels()*2; p = p + 2) {
+        _strip->setPixelColor((p) % _strip->numPixels(), 0);    //turn every third pixel off
     }
     _strip->show();
-
-    for (int p = 0; p < _strip->numPixels(); p = p + 3) {
-        _strip->setPixelColor(p + i, 0);    //turn every third pixel off
-    }
-    i++;
-    i %= 3;
     j++;
-    j %= 256;
+    j %= 10;
+    i++;
+    i %= 10;
 }
 
 // Input a value 0 to 255 to get a color value.

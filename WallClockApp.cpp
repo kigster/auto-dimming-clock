@@ -13,7 +13,6 @@
 
 WallClockApp::WallClockApp(HardwareConfig configuration) {
     config = configuration;
-    matrix = new Adafruit_7segment();
 #ifdef ENABLE_LCD
     lcd = new LiquidCrystal_I2C(0x3F, 20, config.pinRotaryButton);
 #endif
@@ -28,13 +27,15 @@ WallClockApp::WallClockApp(HardwareConfig configuration) {
     menu = NULL;
 #endif
 #ifdef ENABLE_SET_TIME
-    helper = new SetTimeHelper();
+//    helper = new SetTimeHelper();
 #endif
 }
 
 void WallClockApp::setup() {
-    matrix->begin(0x70);
-    matrix->clear();
+    matrix.begin(0x70);
+    matrix.clear();
+    matrix.writeDisplay();
+
 #ifdef ENABLE_MENU
     if (!menu)
         menu = new SetTimeMenu(this);
@@ -66,7 +67,7 @@ void WallClockApp::setBrightness(signed short brightnessValue) {
     if (brightnessValue > 15) brightnessValue = 15;
     if (brightnessValue < 0) brightnessValue = 0;
     brightness = brightnessValue;
-    matrix->setBrightness(brightness);
+    matrix.setBrightness(brightness);
     sprintf(buffer, "Brightness[0-15]:%2d", brightness);
     debug(1, buffer, false);
 }
@@ -105,10 +106,10 @@ void WallClockApp::displayCurrentTime() {
     if (!RTC.read(tm)) {
         if (RTC.chipPresent()) {
             Serial.println("RTC chip found, but not initialized. Setting to compile time.");
-            helper->setTimeToCompileTime();
+            helper.setTimeToCompileTime();
             return;
         } else {
-            matrix->printError();
+            matrix.printError();
             Serial.println("Time chip not detected");
             lcd->setCursor(0,1);
             lcd->println("Time chip not detected");
@@ -134,21 +135,21 @@ void WallClockApp::displayCurrentTime() {
  */
 void WallClockApp::displayTime(signed short h, signed short m) {
     if (!screenOn && h >= 0 && m >= 0) return;
-    matrix->clear();
+    matrix.clear();
     colonOn = !colonOn;
     if (h < 0 || m < 0) colonOn = false;
     if (h > 0) {
         if (h >= 10) {
-            matrix->writeDigitNum(0, h / 10, false);
+            matrix.writeDigitNum(0, h / 10, false);
         }
-        matrix->writeDigitNum(1, h % 10, false);
+        matrix.writeDigitNum(1, h % 10, false);
     }
-    matrix->drawColon(colonOn);
+    matrix.drawColon(colonOn);
     if (m >= 0) {
-        matrix->writeDigitNum(3, m / 10, false);
-        matrix->writeDigitNum(4, m % 10, false);
+        matrix.writeDigitNum(3, m / 10, false);
+        matrix.writeDigitNum(4, m % 10, false);
     }
-    matrix->writeDisplay();
+    matrix.writeDisplay();
 }
 
 void WallClockApp::getPhotoReading() {
@@ -222,8 +223,8 @@ void WallClockApp::toggleNeoPixels() {
 }
 void WallClockApp::toggleDisplay() {
     screenOn = !screenOn;
-    matrix->clear();
-    matrix->writeDisplay();
+    matrix.clear();
+    matrix.writeDisplay();
     if (screenOn) {
         displayCurrentTime();
     }

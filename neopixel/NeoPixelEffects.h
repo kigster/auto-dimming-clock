@@ -22,6 +22,7 @@ public:
     ~NeoPixelEffects();
     int effectsEnabled();
     int currentEffectIndex();
+    void reset();
 
     // effects
     void colorRed(),
@@ -31,8 +32,10 @@ public:
         randomColor(),
         rainbow(),
         rainbowCycle(),
-        theaterChaseRainbow();
+        theaterChaseRainbow(),
+        fadeCycle();
 
+    void fadeOut(long millis);
     // helpers
     void colorWipe(uint32_t c),
         theaterChase(uint32_t c),
@@ -49,6 +52,7 @@ private:
     int _numEffectsEnabled;
     int _currentEffectIndex;
     uint16_t i, j;
+    bool flag;
 
 };
 

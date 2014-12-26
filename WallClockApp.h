@@ -53,7 +53,7 @@ class WallClockApp {
 public:
     WallClockApp(HardwareConfig config);
 
-    Adafruit_7segment           *matrix;
+    Adafruit_7segment           matrix;
 #ifdef ENABLE_LCD
     LiquidCrystal_I2C           *lcd;  // set the LCD address to 0x27 for a 16 chars and 2 line display
 #endif
@@ -62,7 +62,7 @@ public:
     SetTimeMenu                 *menu;
 #endif
 #ifdef ENABLE_SET_TIME
-    SetTimeHelper               *helper;
+    SetTimeHelper               helper;
 #endif
     NeoPixelManager             *neoPixelManager;
     RotaryEncoderWithButton     *rotary;

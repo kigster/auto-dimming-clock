@@ -27,9 +27,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>Libraries/Adafruit-LED-Backpack</name>
+			<name>Libraries/Adafruit-LED-Backpack-Library</name>
 			<type>2</type>
-			<locationURI>ArduinoPivateLibPath/Adafruit-LED-Backpack</locationURI>
+			<locationURI>ArduinoPivateLibPath/Adafruit-LED-Backpack-Library</locationURI>
 		</link>
 		<link>
 			<name>Libraries/Adafruit_GFX</name>
@@ -42,11 +42,6 @@
 			<locationURI>ArduinoHardwareLibPath/Adafruit_NeoPixel</locationURI>
 		</link>
 		<link>
-			<name>Libraries/AwesomeTimer</name>
-			<type>2</type>
-			<locationURI>ArduinoPivateLibPath/AwesomeTimer</locationURI>
-		</link>
-		<link>
 			<name>Libraries/DS1307RTC</name>
 			<type>2</type>
 			<locationURI>ArduinoHardwareLibPath/DS1307RTC</locationURI>
@@ -57,9 +52,9 @@
 			<locationURI>ArduinoHardwareLibPath/Encoder</locationURI>
 		</link>
 		<link>
-			<name>Libraries/LiquidCrystal_I2C</name>
+			<name>Libraries/LiquidCrystal_I2C2004V1</name>
 			<type>2</type>
-			<locationURI>ArduinoPivateLibPath/LiquidCrystal_I2C</locationURI>
+			<locationURI>ArduinoPivateLibPath/LiquidCrystal_I2C2004V1</locationURI>
 		</link>
 		<link>
 			<name>Libraries/OneButton</name>
