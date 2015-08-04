@@ -7,16 +7,25 @@
  *
  *  (c) 2014 All rights reserved, MIT License.
  */
-#include "BedTime.h"
+#include "../BedTime.h"
 #ifdef ENABLE_MENU
-
-
 #include "SetTimeMenu.h"
+#include "../app/BedTimeApp.h"
 
 SetTimeMenu::SetTimeMenu(BedTimeApp *application) {
     app = application;
     h = m = 0;
     what = "";
+}
+
+SetTimeMenu::SetTimeMenu() {
+    app = NULL;
+    h = m = 0;
+    what = "";
+}
+
+void SetTimeMenu::setApp(BedTimeApp *application) {
+    app = application;
 }
 
 void SetTimeMenu::nextMode() {
@@ -44,7 +53,7 @@ void SetTimeMenu::configureTime() {
         m = tm.Minute;
     } else {
         app->debug(0, "Can't ¨read current time", true);
-        delay(5000);
+        delay(3000);
         return;
     }
 #endif
@@ -76,7 +85,7 @@ void SetTimeMenu::configureTime() {
         app->debug(3, "Success! :)", false);
         app->helper.setTimeTo(tm);
         nextMode();
-        delay(2000);
+        delay(1000);
         /* no break */
     case SetTime::Last:
         app->mode = SetTime::Default;
@@ -89,12 +98,13 @@ void SetTimeMenu::configureTime() {
 
 void SetTimeMenu::selectNumber(signed short *current, int min, int max) {
     SetTime::TimeMode startMode = app->mode;
+    Serial.print("enter: startMode = "); Serial.println((int)startMode);
     app->displayTime(
                       (app->mode == SetTime::Hour ? h : -1),
                       (app->mode == SetTime::Minute ? m : -1)
                       );
     while (app->mode == startMode) {
-        app->rotary->getButton()->tick();
+        app->rotary->button.tick();
         signed short delta = app->rotary->delta();
         if (abs(delta) < 2) {
             delay(20);
@@ -117,6 +127,7 @@ void SetTimeMenu::selectNumber(signed short *current, int min, int max) {
             delay(30);
         }
     }
+    Serial.print("exit: startMode = "); Serial.println((int)startMode);
 }
 
 #endif /* ENABLE_MENU */

@@ -8,7 +8,7 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 
-#include "BedTime.h"
+#include "../BedTime.h"
 #ifdef ENABLE_MENU
 
 #ifndef SETTIMEMENU_H_
@@ -16,13 +16,14 @@
 
 #include <Arduino.h>
 #include <DS1307RTC.h>
-#include "BedTimeApp.h"
 
 class BedTimeApp;
 
 class SetTimeMenu {
 public:
+    SetTimeMenu();
     SetTimeMenu(BedTimeApp *app);
+    void setApp(BedTimeApp *app);
     void configureTime() ;
     void nextMode();
 private:

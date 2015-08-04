@@ -8,13 +8,16 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 
+#include "../BedTime.h"
+#ifdef ENABLE_NEOPIXELS
+
 #include "NeoPixelManager.h"
 #include "NeoPixelEffects.h"
 #include <Adafruit_NeoPixel.h>
 
 NeoPixelManager::NeoPixelManager(uint8_t pixels, uint8_t pin) {
     _strip = new Adafruit_NeoPixel(pixels, pin, NEO_GRB + NEO_KHZ800);
-    _effects = new NeoPixelEffects(_strip);
+    _effects.setStrip(_strip);
     _playing = false;
 }
 
@@ -36,20 +39,20 @@ void NeoPixelManager::begin() {
 
 void NeoPixelManager::nextEffect() {
     _playing = true;
-    if (_effects != NULL)
-        _effects->chooseNewEffect();
+    _effects.chooseNewEffect();
 }
 
 void NeoPixelManager::refreshEffect() {
     _playing = true;
-    if (_effects != NULL)
-        _effects->refreshCurrentEffect();
+    _effects.refreshCurrentEffect();
 }
 
 NeoPixelEffects *NeoPixelManager::effects() {
-    return _effects;
+    return &_effects;
 }
 
 bool NeoPixelManager::playing() {
     return _playing;
 }
+
+#endif

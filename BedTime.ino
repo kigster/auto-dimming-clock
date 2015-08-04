@@ -14,25 +14,28 @@
  *
  * Author: Konstantin Gredeskoul <kigster@gmail.com>
  */
+#include "BedTime.h"
+
 #include <RotaryEncoderWithButton.h>
 #include <SimpleTimer.h>
 #include <Wire.h>
-#include <LiquidCrystal_I2C.h>
 #include <Time.h>
 #include <DS1307RTC.h>
 #include <Adafruit_LEDBackpack.h>
 #include <Adafruit_GFX.h>
 #include <OneButton.h>
 
-
-#include "BedTime.h"
-#include "BedTimeApp.h"
+#ifdef ENABLE_NEOPIXELS
+#include "neopixel/NeoPixelEffects.h"
+#include "neopixel/NeoPixelManager.h"
+#endif
+#include "app/BedTimeApp.h"
 
 HardwareConfig config = {
-        A0,     // Photo
-         3,     // Left Rotary
-         4,     // Right Rotary
-         5,     // Rotary Button
+        A0,     // PhotoResistor
+         2,     // Left Rotary
+         3,     // Right Rotary
+         4,     // Rotary Button
          2      // NeoPixels
 };
 BedTimeApp app(config);
@@ -63,7 +66,9 @@ void displayTimeNow(int timerId) {
     app.displayCurrentTime();
 }
 void readPhotoResistor(int timerId) {
+#ifdef ENABLE_PHOTORESISTOR
     app.getPhotoReading();
+#endif
 }
 void neoPixelRefresh(int timerId) {
     app.neoPixelRefresh();
@@ -73,23 +78,26 @@ void neoPixelNextEffect(int timerId) {
 }
 
 void setup() {
-    Serial.begin(57600);
+    Serial.begin(9600);
 #ifdef TEENSYDUINO
     setSyncProvider(getTeensy3Time);
 #endif
     Serial.println("Clock-A-Roma v1.0");
 
     Serial.println("Moving on to setup...");
+
     app.setup();
+
     displayTimeNow(0);
 
     Serial.println("Establishing callbacks...");
-    app.rotary->getButton()->attachClick(rotaryButtonClick);
-    app.rotary->getButton()->attachDoubleClick(rotaryButtonDoubleClick);
-    app.rotary->getButton()->attachLongPressStart(rotaryButtonLongPress);
+
+    app.rotary->button.attachClick(rotaryButtonClick);
+    app.rotary->button.attachLongPressStart(rotaryButtonLongPress);
+    app.rotary->button.attachDoubleClick(rotaryButtonDoubleClick);
 
     timer.setInterval( 1000, displayTimeNow);
-    timer.setInterval(  200, readPhotoResistor);
+    timer.setInterval( 2000, readPhotoResistor);
     timer.setInterval( 5000, neoPixelNextEffect);
     timer.setInterval(    5, neoPixelRefresh);
 
@@ -108,16 +116,17 @@ void setup() {
     tmElements_t tm;
     bool rtcResult = RTC.read(tm);
     if (RTC.chipPresent()) {
-        if (!rtcResult || tm.Year < 2014>)) {
-            Serial.print("Year returned is < 2014, resetting time.  Year: "); Serial.println(tm.Year);
-            app.helper->setDateToCompileTime();
+        if (!rtcResult) {
+            Serial.println("RTC.read() returned false, resetting to compile time.");
+            app.helper.setDateToCompileTime();
         }
     } else {
-        Serial.println("RTC chip was not detected.")
+        Serial.println("RTC chip was not detected.");
     }
 #endif /* TEENSYDUINO */
 #endif /* ENABLE_SET_TIME */
 
+#ifdef ENABLE_NEOPIXELS
     NeoPixelEffects *n = app.neoPixelManager->effects();
     n->reset();
     for (int i = 0; i < 3 * 255; i++) {
@@ -127,6 +136,7 @@ void setup() {
     n->fadeOut(2000);
     app.neoPixelManager->shutoff();
     Serial.println("Setup complete, entering loop...");
+#endif
 }
 
 void loop() {

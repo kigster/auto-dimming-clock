@@ -27,29 +27,29 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>Libraries/Adafruit-GFX-Library</name>
+			<type>2</type>
+			<locationURI>ArduinoPivateLibPath/Adafruit-GFX-Library</locationURI>
+		</link>
+		<link>
 			<name>Libraries/Adafruit-LED-Backpack-Library</name>
 			<type>2</type>
 			<locationURI>ArduinoPivateLibPath/Adafruit-LED-Backpack-Library</locationURI>
 		</link>
 		<link>
-			<name>Libraries/Adafruit_GFX</name>
-			<type>2</type>
-			<locationURI>ArduinoHardwareLibPath/Adafruit_GFX</locationURI>
-		</link>
-		<link>
 			<name>Libraries/Adafruit_NeoPixel</name>
 			<type>2</type>
-			<locationURI>ArduinoHardwareLibPath/Adafruit_NeoPixel</locationURI>
+			<locationURI>ArduinoPivateLibPath/Adafruit_NeoPixel</locationURI>
 		</link>
 		<link>
 			<name>Libraries/DS1307RTC</name>
 			<type>2</type>
-			<locationURI>ArduinoHardwareLibPath/DS1307RTC</locationURI>
+			<locationURI>ArduinoPivateLibPath/DS1307RTC</locationURI>
 		</link>
 		<link>
 			<name>Libraries/Encoder</name>
 			<type>2</type>
-			<locationURI>ArduinoHardwareLibPath/Encoder</locationURI>
+			<locationURI>ArduinoPivateLibPath/Encoder</locationURI>
 		</link>
 		<link>
 			<name>Libraries/LiquidCrystal_I2C2004V1</name>
@@ -74,7 +74,7 @@
 		<link>
 			<name>Libraries/Time</name>
 			<type>2</type>
-			<locationURI>ArduinoHardwareLibPath/Time</locationURI>
+			<locationURI>ArduinoPivateLibPath/Time</locationURI>
 		</link>
 		<link>
 			<name>Libraries/Wire</name>
@@ -84,21 +84,26 @@
 		<link>
 			<name>arduino/core</name>
 			<type>2</type>
-			<locationURI>ArduinoPlatformPath/cores/teensy3</locationURI>
+			<locationURI>ArduinoPlatformPath/cores/arduino</locationURI>
+		</link>
+		<link>
+			<name>arduino/variant</name>
+			<type>2</type>
+			<locationURI>ArduinoPinPath/eightanaloginputs</locationURI>
 		</link>
 	</linkedResources>
 	<variableList>
 		<variable>
 			<name>ArduinoHardwareLibPath</name>
-			<value>file:/Users/kig/arduino/hardware/teensy/all/libraries</value>
+			<value>file:/Applications/Arduino%201.6.4.app/Contents/Java/hardware/arduino/avr/libraries</value>
 		</variable>
 		<variable>
 			<name>ArduinoPinPath</name>
-			<value>file:/Users/kig/arduino/hardware/teensy/all/variants</value>
+			<value>file:/Applications/Arduino%201.6.4.app/Contents/Java/hardware/arduino/avr/variants</value>
 		</variable>
 		<variable>
 			<name>ArduinoPlatformPath</name>
-			<value>file:/Users/kig/arduino/hardware/teensy/all</value>
+			<value>file:/Applications/Arduino%201.6.4.app/Contents/Java/hardware/arduino/avr</value>
 		</variable>
 	</variableList>
 </projectDescription>

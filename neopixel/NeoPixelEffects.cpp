@@ -7,12 +7,13 @@
  *
  *  (c) 2014 All rights reserved, MIT License.
  */
+#include "../BedTime.h"
+#ifdef ENABLE_NEOPIXELS
 
 #include "NeoPixelEffects.h"
 
 
-NeoPixelEffects::NeoPixelEffects(Adafruit_NeoPixel *strip) {
-    _strip = strip;
+NeoPixelEffects::NeoPixelEffects() {
     _numEffectsEnabled = 0;
     _currentEffectIndex = 0;
     _currentEffect = NULL;
@@ -33,7 +34,10 @@ NeoPixelEffects::NeoPixelEffects(Adafruit_NeoPixel *strip) {
     _numEffectsEnabled %= MAX_EFFECTS;
     chooseNewEffect();
 }
+void NeoPixelEffects::setStrip(Adafruit_NeoPixel *strip) {
+    _strip = strip;
 
+}
 void NeoPixelEffects::reset() {
     i = 0;
     j = 0;
@@ -208,3 +212,4 @@ uint32_t NeoPixelEffects::Wheel(byte WheelPos) {
     }
 }
 
+#endif

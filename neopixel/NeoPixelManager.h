@@ -7,6 +7,8 @@
  *
  *  (c) 2014 All rights reserved, MIT License.
  */
+#include "../BedTime.h"
+#ifdef ENABLE_NEOPIXELS
 
 #ifndef NEOPIXELMANAGER_H_
 #define NEOPIXELMANAGER_H_
@@ -35,10 +37,11 @@ public:
 
 private:
     bool _playing;
-    NeoPixelEffects *_effects;
+    NeoPixelEffects _effects;
     Adafruit_NeoPixel *_strip;
 };
 
 inline NeoPixelManager::~NeoPixelManager() {};
 
 #endif /* NEOPIXELMANAGER_H_ */
+#endif

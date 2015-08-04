@@ -7,6 +7,8 @@
  *
  *  (c) 2014 All rights reserved, MIT License.
  */
+#include "../BedTime.h"
+#ifdef ENABLE_NEOPIXELS
 
 #ifndef NEOPIXELEFFECTS_H_
 #define NEOPIXELEFFECTS_H_
@@ -17,8 +19,9 @@
 
 class NeoPixelEffects {
 public:
-    NeoPixelEffects(Adafruit_NeoPixel *strip);
+    NeoPixelEffects();
     ~NeoPixelEffects();
+    void setStrip(Adafruit_NeoPixel *strip);
     int effectsEnabled();
     int currentEffectIndex();
     void reset();
@@ -59,3 +62,4 @@ inline NeoPixelEffects::~NeoPixelEffects() {};
 
 
 #endif /* NEOPIXELEFFECTS_H_ */
+#endif

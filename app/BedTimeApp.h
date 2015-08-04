@@ -11,22 +11,34 @@
 #ifndef BEDTIMEAPP_H_
 #define BEDTIMEAPP_H_
 
+#include "../BedTime.h"
 #include <Arduino.h>
 #include <RotaryEncoderWithButton.h>
 #include <SimpleTimer.h>
 #include <Wire.h>
+
+#ifdef ENABLE_LCD
 #include <LiquidCrystal_I2C.h>
+#endif
+
 #include <Time.h>
 #include <DS1307RTC.h>
 
 #include <Adafruit_LEDBackpack.h>
 #include <Adafruit_GFX.h>
 #include <OneButton.h>
-#include "SetTimeHelper.h"
-#include "SetTimeMenu.h"
-#include "BedTime.h"
+#ifdef ENABLE_SET_TIME
+//class SetTimeHelper;
+//class SetTimeMenu;
+#include "../settingtime/SetTimeHelper.h"
+#include "../settingtime/SetTimeMenu.h"
+#endif
+
+#ifdef ENABLE_NEOPIXELS
 #include "neopixel/NeoPixelManager.h"
 #include "neopixel/NeoPixelEffects.h"
+#endif
+
 namespace SetTime {
     typedef enum TimeChangeMode_e {
         Default     = (1 << 0),
@@ -45,26 +57,24 @@ typedef struct hardwareConfig_s {
     uint8_t pinNeoPixels;
 } HardwareConfig;
 
-#ifdef ENABLE_MENU
-class SetTimeMenu;
-#endif
-
 class BedTimeApp {
 public:
     BedTimeApp(HardwareConfig config);
 
-    Adafruit_7segment           matrix;
+    Adafruit_7segment           *matrix;
     SetTime::TimeMode           mode;
 #ifdef ENABLE_LCD
     LiquidCrystal_I2C           *lcd;  // set the LCD address to 0x27 for a 16 chars and 2 line display
 #endif
 #ifdef ENABLE_MENU
-    SetTimeMenu                 *menu;
+    SetTimeMenu                 menu;
 #endif
 #ifdef ENABLE_SET_TIME
     SetTimeHelper               helper;
 #endif
+#ifdef ENABLE_NEOPIXELS
     NeoPixelManager             *neoPixelManager;
+#endif
     RotaryEncoderWithButton     *rotary;
     HardwareConfig              config;
     char                        buffer[128];
