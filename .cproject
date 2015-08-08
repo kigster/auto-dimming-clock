@@ -29,7 +29,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BedTime/Libraries/Wire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BedTime/Libraries/Wire/utility}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BedTime/Libraries/SimpleTimer}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BedTime/Libraries/LiquidCrystal_I2C2004V1}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BedTime/Libraries/DS1307RTC}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BedTime/Libraries/Adafruit_NeoPixel}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BedTime/arduino/variant}&quot;"/>
@@ -48,7 +47,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BedTime/Libraries/Wire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BedTime/Libraries/Wire/utility}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BedTime/Libraries/SimpleTimer}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BedTime/Libraries/LiquidCrystal_I2C2004V1}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BedTime/Libraries/DS1307RTC}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BedTime/Libraries/Adafruit_NeoPixel}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BedTime/arduino/variant}&quot;"/>

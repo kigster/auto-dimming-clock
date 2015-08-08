@@ -12,9 +12,9 @@
 #define _BEDTIME_H_
 
 //#define ENABLE_LCD
-//#define ENABLE_PHOTORESISTOR
+#define ENABLE_PHOTORESISTOR
 #define ENABLE_SET_TIME
 #define ENABLE_MENU
-//#define ENABLE_NEOPIXELS
+#define ENABLE_NEOPIXELS
 
 #endif

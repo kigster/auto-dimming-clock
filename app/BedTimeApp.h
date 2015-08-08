@@ -27,16 +27,15 @@
 #include <Adafruit_LEDBackpack.h>
 #include <Adafruit_GFX.h>
 #include <OneButton.h>
+
 #ifdef ENABLE_SET_TIME
-//class SetTimeHelper;
-//class SetTimeMenu;
 #include "../settingtime/SetTimeHelper.h"
 #include "../settingtime/SetTimeMenu.h"
 #endif
 
 #ifdef ENABLE_NEOPIXELS
-#include "neopixel/NeoPixelManager.h"
-#include "neopixel/NeoPixelEffects.h"
+#include "../neopixel/NeoPixelManager.h"
+#include "../neopixel/NeoPixelEffects.h"
 #endif
 
 namespace SetTime {

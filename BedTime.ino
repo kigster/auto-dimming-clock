@@ -32,7 +32,7 @@
 #include "app/BedTimeApp.h"
 
 HardwareConfig config = {
-        A0,     // PhotoResistor
+        A3,     // PhotoResistor
          2,     // Left Rotary
          3,     // Right Rotary
          4,     // Rotary Button

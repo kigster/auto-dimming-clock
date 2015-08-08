@@ -52,11 +52,6 @@
 			<locationURI>ArduinoPivateLibPath/Encoder</locationURI>
 		</link>
 		<link>
-			<name>Libraries/LiquidCrystal_I2C2004V1</name>
-			<type>2</type>
-			<locationURI>ArduinoPivateLibPath/LiquidCrystal_I2C2004V1</locationURI>
-		</link>
-		<link>
 			<name>Libraries/OneButton</name>
 			<type>2</type>
 			<locationURI>ArduinoPivateLibPath/OneButton</locationURI>
