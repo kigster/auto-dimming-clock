@@ -8,32 +8,31 @@
  *  (c) 2015 All rights reserved, MIT License.
  */
 
-#ifndef BEDTIME_STATE_H_
-#define BEDTIME_STATE_H_
+#ifndef WALLOCK_STATE_H_
+#define WALLOCK_STATE_H_
+
 #include "GaugedValue.h"
 
-class State {
-private:
-    GaugedValue *outsideBrightness, *displayBrightness;
+namespace Wallock {
+    class State {
+    private:
+        GaugedValue &photoresistorReading,
+                    &displayBrightness;
 
-    bool colonOn = false, displayOn = false, neoPixelsOn = false;
-public:
-    State(GaugedValue *_outsideBrightness, GaugedValue *_displayBrightness) {
-        outsideBrightness = _outsideBrightness;
-        displayBrightness = _displayBrightness;
-    }
+        bool    colonOn = false,
+                displayOn = false,
+                neoPixelsOn = false;
+    public:
+        State(GaugedValue &g1, GaugedValue &g2) :
+            photoresistorReading(g1),
+            displayBrightness(g2) {};
 
-    void setPhotoresistorValue(uint16_t photoValue) {
-        outsideBrightness->setCurrent(photoValue);
-    }
-    GaugedValue *getOutsideBrightness() {
-        return outsideBrightness;
-    }
-    GaugedValue *getDisplayBrightness() {
-        return displayBrightness;
-    }
-
-
+        GaugedValue &getOutsideBrightness() {
+            return photoresistorReading;
+        }
+        GaugedValue &getDisplayBrightness() {
+            return displayBrightness;
+        }
+    };
 };
-
-#endif /* BEDTIME_STATE_H_ */
+#endif /* WALLOCK_STATE_H_ */

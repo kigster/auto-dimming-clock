@@ -13,26 +13,26 @@
 
 #ifndef SETTIMEMENU_H_
 #define SETTIMEMENU_H_
+namespace Wallock {
+    class App;
 
-class App;
+    class SetTimeMenu {
+    public:
+        SetTimeMenu();
+        SetTimeMenu(Wallock::App *app);
+        void setApp(Wallock::App *app);
+        void configureTime() ;
+        void nextMode();
+    private:
 
-class SetTimeMenu {
-public:
-    SetTimeMenu();
-    SetTimeMenu(App *app);
-    void setApp(App *app);
-    void configureTime() ;
-    void nextMode();
-private:
+        signed short h, m;
+        App *app;
+        char *what;
+        void instructions();
+        void updateTimeCallback();
+        void selectNumber(signed short *current, int min, int max);
 
-    signed short h, m;
-    App *app;
-    char *what;
-    void instructions();
-    void updateTimeCallback();
-    void selectNumber(signed short *current, int min, int max);
-
-};
-
+    };
+}
 #endif /* SETTIMEMENU_H_ */
 #endif /* ENABLE_MENU */

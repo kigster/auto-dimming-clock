@@ -8,14 +8,17 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 
-#ifndef _BEDTIME_H_
-    #define _BEDTIME_H_
+#ifndef _WALLOCK_H_
+    #define _WALLOCK_H_
 
     #define ENABLE_PHOTORESISTOR
     #define ENABLE_SET_TIME
     #define ENABLE_MENU
+
     //#define ENABLE_LCD
     //#define ENABLE_NEOPIXELS
+
+    #define DEBUG
 #endif
 
 #include "Arduino.h"

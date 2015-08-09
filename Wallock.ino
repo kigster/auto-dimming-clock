@@ -15,30 +15,33 @@
  * Author: Konstantin Gredeskoul <kigster@gmail.com>
  */
 #include "Wallock.h"
+#include "app/App.h"
+#include "app/State.h"
+
+char buffer[128];
+
+Wallock::GaugedValue brightnessGauge("brightness", 0, 15);
+Wallock::GaugedValue photoGauge("photo-value", (1 << 0), (1 << 10));
+
+Wallock::PinoutMapping pinout = {
+        A3,     // PhotoResistor
+         2,     // Left Rotary
+         3,     // Right Rotary
+         4,     // Rotary Button
+         2      // Number of NeoPixels
+};
+
+Wallock::State state(brightnessGauge, photoGauge);
+RotaryEncoderWithButton rotary((uint8_t) pinout.pinRotaryLeft, (uint8_t) pinout.pinRotaryRight, (uint8_t) pinout.pinRotaryButton);
+Adafruit_7segment matrix;
+
+Wallock::App app(pinout, state, rotary, matrix);
+SimpleTimer timer(1);
 
 #ifdef ENABLE_NEOPIXELS
 #include "neopixel/NeoPixelEffects.h"
 #include "neopixel/NeoPixelManager.h"
 #endif
-
-#include "app/App.h"
-#include "app/State.h"
-
-State state(new GaugedValue("display", 0, 15),
-            new GaugedValue("photoresistor", (1 << 0), (1 << 10)));
-
-HardwareConfig config = {
-        A3,     // PhotoResistor
-         2,     // Left Rotary
-         3,     // Right Rotary
-         4,     // Rotary Button
-         2,     // NeoPixels
-         &state
-};
-
-char buffer[128];
-App app(&config);
-SimpleTimer timer(1);
 
 #ifdef TEENSYDUINO
 time_t getTeensy3Time() {
@@ -76,6 +79,23 @@ void neoPixelNextEffect(int timerId) {
     app.neoPixelNextEffect();
 }
 
+void resetRTC() {
+    tmElements_t tm;
+    bool rtcResult = RTC.read(tm);
+    if (RTC.chipPresent()) {
+        if (!rtcResult) {
+            Serial.println("RTC.read() returned false, resetting to compile time.");
+            app.helper.setDateToCompileTime();
+        } else {
+            sprintf(buffer, "RTC.read() successful, booting at %d/%d/%d %d:%d", tm.Month, tm.Day, tm.Year, tm.Hour,
+                            tm.Second);
+            Serial.println(buffer);
+        }
+    } else {
+        Serial.println("RTC chip was not detected.");
+    }
+}
+
 void setup() {
     Serial.begin(9600);
 #ifdef TEENSYDUINO
@@ -89,9 +109,9 @@ void setup() {
 
     Serial.println("Establishing callbacks...");
 
-    app.rotary->button.attachClick(rotaryButtonClick);
-    app.rotary->button.attachLongPressStart(rotaryButtonLongPress);
-    app.rotary->button.attachDoubleClick(rotaryButtonDoubleClick);
+    app.getButton()->attachClick(rotaryButtonClick);
+    app.getButton()->attachLongPressStart(rotaryButtonLongPress);
+    app.getButton()->attachDoubleClick(rotaryButtonDoubleClick);
 
     timer.setInterval( 1000, displayTimeNow);
     timer.setInterval( 2000, readPhotoResistor);
@@ -110,19 +130,7 @@ void setup() {
         Serial.println("[OK]");
     }
 #else
-    tmElements_t tm;
-    bool rtcResult = RTC.read(tm);
-    if (RTC.chipPresent()) {
-        if (!rtcResult) {
-            Serial.println("RTC.read() returned false, resetting to compile time.");
-            app.helper.setDateToCompileTime();
-        } else {
-            sprintf(buffer, "RTC.read() successful, booting at %d/%d/%d %d:%d", tm.Month, tm.Day, tm.Year, tm.Hour, tm.Second);
-            Serial.println(buffer);
-        }
-    } else {
-        Serial.println("RTC chip was not detected.");
-    }
+    resetRTC();
 #endif /* TEENSYDUINO */
 #endif /* ENABLE_SET_TIME */
 
