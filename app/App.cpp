@@ -12,6 +12,8 @@
 #include "../Wallock.h"
 #include "App.h"
 
+#define INITIAL_BRIGHTNESS 7
+
 namespace Wallock {
     App::App(       PinoutMapping               &_pinout,
                     State                       &_state,
@@ -27,8 +29,12 @@ namespace Wallock {
 
         screenOn = colonOn = true;
         mode = SetTime::Default;
+
         state.getDisplayBrightness().setMinMax(0, 15);
-        state.getOutsideBrightness().setMinMax(0, 1023);
+        state.getDisplayBrightness().setCurrent(INITIAL_BRIGHTNESS);
+
+        state.getPhotoresistorReading().setMinMax(0, 1023);
+
         neoPixelsOn = false;
     #ifdef ENABLE_LCD
         lcd = new LiquidCrystal_I2C(0x3F, 20, 4);
@@ -46,6 +52,7 @@ namespace Wallock {
         matrix.clear();
         matrix.print(0x0000, HEX);
         matrix.writeDisplay();
+        changeDisplayBrightness();
         delay(1000);
     #ifdef ENABLE_PHOTORESISTOR
         pinMode(pinout.pinPhotoResistor, INPUT);
@@ -66,8 +73,7 @@ namespace Wallock {
 
     void App::run() {
         rotary.tick();
-//        matrix.setBrightness(15);
-    //    readEnvironment();
+        readEnvironment();
     //    refreshUI();
     }
     void App::readEnvironment() {
@@ -78,12 +84,25 @@ namespace Wallock {
     void App::readKnob() {
         signed short delta = rotary.delta();
         if (delta != 0) {
-            state.getDisplayBrightness().addDeltaToCurrent(delta);
+
+            if (state.getDisplayBrightness().addDeltaToCurrent(delta)) {
+                changeDisplayBrightness();
+            }
         }
     }
+
+    void App::changeDisplayBrightness() {
+        matrix.setBrightness(state.getDisplayBrightness().getCurrent());
+    }
+
     void App::readPhotoresitor() {
-        uint32_t v = analogRead(pinout.pinPhotoResistor);
-        state.getOutsideBrightness().setCurrent(v);
+        GaugedValue &photo = state.getPhotoresistorReading();
+        GaugedValue &display = state.getDisplayBrightness();
+
+        if (photo.setCurrent(analogRead(pinout.pinPhotoResistor)) ) {
+            if (display.applyDeltaPercent(photo.lastDeltaPercent()))
+                changeDisplayBrightness();
+        }
 
     #ifdef ENABLE_LCD
         lcd->setCursor(0,2);
@@ -94,8 +113,8 @@ namespace Wallock {
     }
 
     void App::refreshUI() {
-        state.getOutsideBrightness().applyMyDeltaTo((GaugedValue *) &state.getDisplayBrightness());
-        signed short currentBrightness = state.getDisplayBrightness().getCurrent();
+//        state.getPhotoresistorReading().applyMyDeltaTo((GaugedValue *) &state.getDisplayBrightness());
+//        signed short currentBrightness = state.getDisplayBrightness().getCurrent();
         // matrix.setBrightness(currentBrightness);
     }
 
@@ -152,6 +171,7 @@ namespace Wallock {
         if (h == 0) { h = 12; }
         m = tm.Minute;
         if (screenOn) displayTime(h, m);
+        Serial.print(F("Current time is "));
         sprintf(buffer, "%2d:%02d:%02d %d/%02d/%d", h, m, tm.Second, tm.Month, tm.Day, 1970 + tm.Year);
         debug(2, buffer, true);
     }

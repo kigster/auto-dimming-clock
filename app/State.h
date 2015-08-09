@@ -27,7 +27,7 @@ namespace Wallock {
             photoresistorReading(g1),
             displayBrightness(g2) {};
 
-        GaugedValue &getOutsideBrightness() {
+        GaugedValue &getPhotoresistorReading() {
             return photoresistorReading;
         }
         GaugedValue &getDisplayBrightness() {

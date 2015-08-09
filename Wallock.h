@@ -18,7 +18,8 @@
     //#define ENABLE_LCD
     //#define ENABLE_NEOPIXELS
 
-    #define DEBUG
+    #define DEBUG 1
+
 #endif
 
 #include "Arduino.h"

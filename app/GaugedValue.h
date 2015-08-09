@@ -12,7 +12,8 @@
 #define GAUGEDVALUE_H_
 #include "../Wallock.h"
 
-const static int PRINT_WAIT_MS = 1000;
+const static int PRINT_WAIT_MS = 100;
+
 namespace Wallock {
     class GaugedValue {
     private:
@@ -20,15 +21,20 @@ namespace Wallock {
         signed int lastValue;
         signed int max;
         signed int min;
+        signed int increment;
+        bool changed;
         unsigned long lastChangedEpoch;
         unsigned long lastPrintedEpoch;
         const char * name;
     public:
-        GaugedValue(const char *_name, unsigned short _min, unsigned short _max) {
-            name = (char *)_name;
-            min = _min;
-            max = _max;
-            current = 0;
+        GaugedValue(const char *_name, unsigned short _min, unsigned short _max, unsigned int _increment) {
+            name        = (char *)_name;
+            min         = _min;
+            max         = _max;
+            changed     = false;
+            current     = 0;
+            increment   = _increment;
+
             setMinMax(0, 0);
         }
         bool isInitialized() {
@@ -39,26 +45,39 @@ namespace Wallock {
             return current;
         }
 
-        void setCurrent(signed int newValue) {
-            uint32_t rightNow = now();
+        signed int delta() {
+            return current - lastValue;
+        }
 
-            if (newValue > max && lastValue != max) {
-                newValue = max;
-            } else if (newValue < min && lastValue != min) {
-                newValue = min;
+        bool setCurrent(signed int newValue) {
+            time_t rightNow = now();
+            changed = false;
+
+            // if the difference exceeds increment reduce down to increment itself.
+            // this allows to cap any "jumps" in values
+            if (abs(newValue - lastValue) > abs(increment)) {
+                // too large of a change, default to our increment.
+                signed int sign = abs(newValue - lastValue) / (newValue - lastValue);
+                newValue = lastValue + sign * increment;
+            } else if (abs(newValue - lastValue) < abs(increment)) {
+                // insufficient change, so no change at all
+                newValue = lastValue;
             }
+
+            if (newValue > max)             newValue = max;
+            else if (newValue < min)        newValue = min;
 
             if (newValue != lastValue) {
+                changed = true;
+
                 lastValue = current;
                 current = newValue;
-            }
-#ifdef DEBUG
-            if (rightNow - lastPrintedEpoch > PRINT_WAIT_MS) {
+
                 sprintf(buffer, "%s: %4d --> %4d", name, lastValue, newValue);
                 Serial.println(buffer);
-                lastPrintedEpoch = rightNow;
             }
-#endif
+
+            return changed;
         }
         void setMinMax(signed int  _min, signed int  _max) {
             min = _min;
@@ -76,14 +95,14 @@ namespace Wallock {
         float lastDeltaPercent() {
             return ((float) 100.0 * (current - lastValue) / (max - min));
         }
-        void addDeltaToCurrent(signed int delta) {
-            setCurrent(current += delta);
+        bool addDeltaToCurrent(signed int delta) {
+            return setCurrent(current += delta);
         }
-        void applyDeltaPercent(float deltaPerc) {
-            addDeltaToCurrent((deltaPerc / 100.0 * (max - min) ));
+        bool applyDeltaPercent(float deltaPerc) {
+            return addDeltaToCurrent((deltaPerc / 100.0 * (max - min) ));
         }
-        void applyMyDeltaTo(GaugedValue *another) {
-            another->applyDeltaPercent(this->lastDeltaPercent());
+        bool applyMyDeltaTo(GaugedValue *another) {
+            return another->applyDeltaPercent(this->lastDeltaPercent());
         }
     };
 };

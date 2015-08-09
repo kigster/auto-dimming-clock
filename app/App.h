@@ -58,8 +58,7 @@ namespace Wallock {
 
             tmElements_t                                lastDisplayedTime;
 
-
-            bool colonOn, screenOn, neoPixelsOn;
+            bool                                        colonOn, screenOn, neoPixelsOn;
 
         public:
             App(            PinoutMapping               &_pinout,
@@ -87,6 +86,7 @@ namespace Wallock {
 
             void refreshUI();
             void readEnvironment();
+            void changeDisplayBrightness();
 
             void displayTime(signed short h, signed short m);
             void displayCurrentTime();
@@ -96,7 +96,6 @@ namespace Wallock {
             void neoPixelRefresh();
             void neoPixelNextEffect();
 
-            // Callbacks
             void cb_ButtonClick();
             void cb_ButtonDoubleClick();
             void cb_ButtonHold();
