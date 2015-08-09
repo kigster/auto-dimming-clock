@@ -8,9 +8,9 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 
-#include "../BedTime.h"
 #include "BedTimeApp.h"
 #include <Arduino.h>
+#include "../Wallock.h"
 
 BedTimeApp::BedTimeApp(HardwareConfig *_config) {
 //    memset(&lastDisplayedTime, 0x0, sizeof(tmElements_t));

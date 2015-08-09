@@ -14,7 +14,7 @@
  *
  * Author: Konstantin Gredeskoul <kigster@gmail.com>
  */
-#include "BedTime.h"
+#include "Wallock.h"
 
 #ifdef ENABLE_NEOPIXELS
 #include "neopixel/NeoPixelEffects.h"

@@ -11,9 +11,9 @@
 #ifndef BEDTIMEAPP_H_
 #define BEDTIMEAPP_H_
 
+#include "../Wallock.h"
 #include "State.h"
 
-#include "../BedTime.h"
 
 #ifdef ENABLE_LCD
 #include <LiquidCrystal_I2C.h>

@@ -10,7 +10,7 @@
 
 #ifndef GAUGEDVALUE_H_
 #define GAUGEDVALUE_H_
-#include "../BedTime.h"
+#include "../Wallock.h"
 
 const static int PRINT_WAIT_MS = 1000;
 

@@ -1,5 +1,5 @@
 /*
- * BedTime.h – feature flags
+ * Wallock.h – feature flags
  *
  *  Created on: Dec 19, 2014
  *      Author: Konstantin Gredeskoul

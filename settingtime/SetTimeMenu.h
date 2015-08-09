@@ -8,7 +8,7 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 
-#include "../BedTime.h"
+#include "../Wallock.h"
 #ifdef ENABLE_MENU
 
 #ifndef SETTIMEMENU_H_

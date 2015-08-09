@@ -7,7 +7,7 @@
  *
  *  (c) 2014 All rights reserved, MIT License.
  */
-#include "../BedTime.h"
+#include "../Wallock.h"
 #ifdef ENABLE_MENU
 #include "SetTimeMenu.h"
 #include "../app/BedTimeApp.h"
