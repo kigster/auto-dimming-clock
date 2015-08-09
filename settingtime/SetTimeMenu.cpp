@@ -16,13 +16,13 @@ namespace Wallock {
     SetTimeMenu::SetTimeMenu(Wallock::App *application) {
         app = application;
         h = m = 0;
-        what = (char *)"";
+        what = (char *) "";
     }
 
     SetTimeMenu::SetTimeMenu() {
         app = NULL;
         h = m = 0;
-        what = (char *)"";
+        what = (char *) "";
     }
 
     void SetTimeMenu::setApp(Wallock::App *application) {
@@ -30,10 +30,8 @@ namespace Wallock {
     }
 
     void SetTimeMenu::nextMode() {
-        if (app->mode == SetTime::Last)
-            app->mode = SetTime::Default;
-        else
-            app->mode = (SetTime::TimeMode) ((int) app->mode << 1);
+        if (app->mode == SetTime::Last) app->mode = SetTime::Default;
+        else app->mode = (SetTime::TimeMode) ((int) app->mode << 1);
         printf("Mode Changed, new mode: %d", (int) app->mode);
     }
     void SetTimeMenu::instructions() {
@@ -42,7 +40,7 @@ namespace Wallock {
     }
 
     void SetTimeMenu::configureTime() {
-        Serial.println("Entering setup...");
+        Serial.println(F("Entering configureTime()..."));
         nextMode();
         tmElements_t tm;
     #ifdef TEENSYDUINO
@@ -50,7 +48,9 @@ namespace Wallock {
     #else
         if (RTC.read(tm)) {
             h = tm.Hour % 12;
-            if (h == 0) { h = 12; }
+            if (h == 0) {
+                h = 12;
+            }
             m = tm.Minute;
         } else {
             app->debug(0, "Can't ¨read current time", true);
@@ -62,18 +62,16 @@ namespace Wallock {
         case SetTime::Hour:
             app->debug(0, "====== Setup =======", true);
             instructions();
-            what = (char *)"Hours";
+            what = (char *) "Hours";
             h = tm.Hour;
             selectNumber(&h, 1, 12);
-            if (app->mode == SetTime::Default)
-                break;
+            if (app->mode == SetTime::Default) break;
             /* no break */
         case SetTime::Minute:
-            what = (char *)"Minutes";
+            what = (char *) "Minutes";
             m = tm.Minute;
             selectNumber(&m, 0, 59);
-            if (app->mode == SetTime::Default)
-                break;
+            if (app->mode == SetTime::Default) break;
             /* no break */
         case SetTime::Save:
             tm.Hour = h;
@@ -99,11 +97,9 @@ namespace Wallock {
 
     void SetTimeMenu::selectNumber(signed short *current, int min, int max) {
         SetTime::TimeMode startMode = app->mode;
-        Serial.print("enter: startMode = "); Serial.println((int)startMode);
-        app->displayTime(
-                          (app->mode == SetTime::Hour ? h : -1),
-                          (app->mode == SetTime::Minute ? m : -1)
-                          );
+        Serial.print(F("Entering: selectNumber()"));
+        Serial.println((int) startMode);
+        app->displayTime((app->mode == SetTime::Hour ? h : -1), (app->mode == SetTime::Minute ? m : -1));
         while (app->mode == startMode) {
             app->getButton()->tick();
             signed short delta = app->getRotary()->delta();
@@ -114,21 +110,17 @@ namespace Wallock {
             delta = (delta > 0) ? 1 : -1;
             int prev = *current;
             *current = *current + delta;
-            if (*current > max)
-                *current = max;
-            if (*current < min)
-                *current = min;
+            if (*current > max) *current = max;
+            if (*current < min) *current = min;
             if (prev != *current) {
-                app->displayTime(
-                        (app->mode == SetTime::Hour ? h : -1),
-                        (app->mode == SetTime::Minute ? m : -1)
-                        );
+                app->displayTime((app->mode == SetTime::Hour ? h : -1), (app->mode == SetTime::Minute ? m : -1));
                 sprintf(buffer, "%-7s: %2d:%02d", what, h, m);
                 app->debug(1, buffer, false);
                 delay(30);
             }
         }
-        Serial.print("exit: startMode = "); Serial.println((int)startMode);
+        Serial.print(F("Exiting: selectNumber() "));
+        Serial.println((int) startMode);
     }
 }
 #endif /* ENABLE_MENU */

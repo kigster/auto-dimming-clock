@@ -66,8 +66,7 @@ namespace Wallock {
 
     void App::run() {
         rotary.tick();
-        matrix.setBrightness(15);
-        displayCurrentTime();
+//        matrix.setBrightness(15);
     //    readEnvironment();
     //    refreshUI();
     }
@@ -97,9 +96,7 @@ namespace Wallock {
     void App::refreshUI() {
         state.getOutsideBrightness().applyMyDeltaTo((GaugedValue *) &state.getDisplayBrightness());
         signed short currentBrightness = state.getDisplayBrightness().getCurrent();
-    //    matrix.setBrightness(currentBrightness);
-        sprintf(buffer, "refreshing screen brightness [0-15] to %2d", currentBrightness);
-        debug(1, buffer, false);
+        // matrix.setBrightness(currentBrightness);
     }
 
     void App::neoPixelRefresh() {
@@ -182,7 +179,7 @@ namespace Wallock {
     }
 
     void App::cb_ButtonClick() {
-        Serial.print("Entering BedTimeApp::cb_ButtonClick, mode = ");
+        Serial.print(F("Entering BedTimeApp::cb_ButtonClick, mode = "));
         Serial.println((int) mode);
         if (mode != SetTime::Default) {
     #ifdef ENABLE_MENU
@@ -205,15 +202,15 @@ namespace Wallock {
     }
 
     void App::cb_ButtonHold() {
-        Serial.print("Entering BedTimeApp::cb_ButtonHold, mode = ");
+        Serial.print(F("Entering BedTimeApp::cb_ButtonHold, mode = "));
         Serial.println((int) mode);
         if (mode == SetTime::Default) {
-            Serial.println("Mode is Default -> calling configureTime()");
+            Serial.println(F("Mode is Default -> calling configureTime()"));
     #ifdef ENABLE_MENU
             menu.configureTime();
     #endif
         } else {
-            Serial.println("Mode is not Default, Hold is ignored.");
+            Serial.println(F("Mode is not Default, Hold is ignored."));
         }
     }
 

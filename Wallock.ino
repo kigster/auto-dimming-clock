@@ -18,7 +18,7 @@
 #include "app/App.h"
 #include "app/State.h"
 
-char buffer[128];
+char buffer[80];
 
 Wallock::GaugedValue brightnessGauge("brightness", 0, 15);
 Wallock::GaugedValue photoGauge("photo-value", (1 << 0), (1 << 10));
@@ -50,17 +50,17 @@ time_t getTeensy3Time() {
 #endif
 
 void rotaryButtonClick() {
-    Serial.println("rotaryButtonClick()");
+    Serial.println(F("rotaryButtonClick()"));
     app.cb_ButtonClick();
     delay(100);
 }
 void rotaryButtonDoubleClick() {
-    Serial.println("rotaryButtonDoubleClick()");
+    Serial.println(F("rotaryButtonDoubleClick()"));
     app.cb_ButtonDoubleClick();
     delay(100);
 }
 void rotaryButtonLongPress() {
-    Serial.println("rotaryButtonLongPress()");
+    Serial.println(F("rotaryButtonLongPress()"));
     app.cb_ButtonHold();
     delay(100);
 }
@@ -84,7 +84,7 @@ void resetRTC() {
     bool rtcResult = RTC.read(tm);
     if (RTC.chipPresent()) {
         if (!rtcResult) {
-            Serial.println("RTC.read() returned false, resetting to compile time.");
+            Serial.println(F("RTC.read() returned false, resetting to compile time"));
             app.helper.setDateToCompileTime();
         } else {
             sprintf(buffer, "RTC.read() successful, booting at %d/%d/%d %d:%d", tm.Month, tm.Day, tm.Year, tm.Hour,
@@ -101,13 +101,13 @@ void setup() {
 #ifdef TEENSYDUINO
     setSyncProvider(getTeensy3Time);
 #endif
-    Serial.println("Clock-A-Roma v1.0");
+    Serial.println(F("Clock-A-Roma v1.0"));
 
-    Serial.println("Moving on to setup...");
+    Serial.println(F("Moving on to setup..."));
 
     app.setup();
 
-    Serial.println("Establishing callbacks...");
+    Serial.println(F("Establishing callbacks..."));
 
     app.getButton()->attachClick(rotaryButtonClick);
     app.getButton()->attachLongPressStart(rotaryButtonLongPress);
@@ -118,7 +118,7 @@ void setup() {
     timer.setInterval( 5000, neoPixelNextEffect);
     timer.setInterval(    5, neoPixelRefresh);
 
-    Serial.print("Checking time chip and current time... ");
+    Serial.print(F("Checking time chip and current time... "));
 
 #ifdef ENABLE_SET_TIME
 #ifdef TEENSYDUINO
