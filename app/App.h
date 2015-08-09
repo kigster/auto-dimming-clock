@@ -51,9 +51,9 @@ typedef struct hardwareConfig_s {
     State *state;
 } HardwareConfig;
 
-class BedTimeApp {
+class App {
 public:
-    BedTimeApp(HardwareConfig *config);
+    App(HardwareConfig *config);
 
     State                       *state;
     Adafruit_7segment           *matrix;

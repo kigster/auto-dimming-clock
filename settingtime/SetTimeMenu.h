@@ -14,19 +14,19 @@
 #ifndef SETTIMEMENU_H_
 #define SETTIMEMENU_H_
 
-class BedTimeApp;
+class App;
 
 class SetTimeMenu {
 public:
     SetTimeMenu();
-    SetTimeMenu(BedTimeApp *app);
-    void setApp(BedTimeApp *app);
+    SetTimeMenu(App *app);
+    void setApp(App *app);
     void configureTime() ;
     void nextMode();
 private:
 
     signed short h, m;
-    BedTimeApp *app;
+    App *app;
     char *what;
     void instructions();
     void updateTimeCallback();

@@ -21,7 +21,7 @@
 #include "neopixel/NeoPixelManager.h"
 #endif
 
-#include "app/BedTimeApp.h"
+#include "app/App.h"
 #include "app/State.h"
 
 State state(new GaugedValue("display", 0, 15),
@@ -37,7 +37,7 @@ HardwareConfig config = {
 };
 
 char buffer[128];
-BedTimeApp app(&config);
+App app(&config);
 SimpleTimer timer(1);
 
 #ifdef TEENSYDUINO

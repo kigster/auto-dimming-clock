@@ -8,11 +8,11 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 
-#include "BedTimeApp.h"
 #include <Arduino.h>
 #include "../Wallock.h"
+#include "App.h"
 
-BedTimeApp::BedTimeApp(HardwareConfig *_config) {
+App::App(HardwareConfig *_config) {
 //    memset(&lastDisplayedTime, 0x0, sizeof(tmElements_t));
     config = _config;
     state = config->state;
@@ -34,7 +34,7 @@ BedTimeApp::BedTimeApp(HardwareConfig *_config) {
 #endif
 }
 
-void BedTimeApp::setup() {
+void App::setup() {
     matrix->begin(0x70);
     matrix->clear();
     matrix->print(0x0000, HEX);
@@ -56,25 +56,25 @@ void BedTimeApp::setup() {
     neoPixelManager->begin();
 #endif
 }
-void BedTimeApp::run() {
+void App::run() {
     rotary->tick();
     matrix->setBrightness(15);
     displayCurrentTime();
 //    readEnvironment();
 //    refreshUI();
 }
-void BedTimeApp::readEnvironment() {
+void App::readEnvironment() {
     readPhotoresitor();
     readKnob();
 }
 
-void BedTimeApp::readKnob() {
+void App::readKnob() {
     signed short delta = rotary->delta();
     if (delta != 0) {
         state->getDisplayBrightness()->addDeltaToCurrent(delta);
     }
 }
-void BedTimeApp::readPhotoresitor() {
+void App::readPhotoresitor() {
     uint32_t v = analogRead(config->pinPhotoResistor);
     state->getOutsideBrightness()->setCurrent(v);
 
@@ -86,7 +86,7 @@ void BedTimeApp::readPhotoresitor() {
 #endif
 }
 
-void BedTimeApp::refreshUI() {
+void App::refreshUI() {
     state->getOutsideBrightness()->applyMyDeltaTo(state->getDisplayBrightness());
     signed short currentBrightness = state->getDisplayBrightness()->getCurrent();
 //    matrix->setBrightness(currentBrightness);
@@ -94,24 +94,24 @@ void BedTimeApp::refreshUI() {
     debug(1, buffer, false);
 }
 
-void BedTimeApp::neoPixelRefresh() {
+void App::neoPixelRefresh() {
 #ifdef ENABLE_NEOPIXELS
     if (neoPixelsOn)
         neoPixelManager->refreshEffect();
 #endif
 }
-void BedTimeApp::neoPixelNextEffect() {
+void App::neoPixelNextEffect() {
 #ifdef ENABLE_NEOPIXELS
     if (neoPixelsOn)
         neoPixelManager->nextEffect();
 #endif
 }
 
-void BedTimeApp::debug(const char *message) {
+void App::debug(const char *message) {
     Serial.println(message);
 }
 
-void BedTimeApp::debug(int row, const char *message, bool clear) {
+void App::debug(int row, const char *message, bool clear) {
 #ifdef ENABLE_LCD
     if (clear)
         lcd->clear();
@@ -123,7 +123,7 @@ void BedTimeApp::debug(int row, const char *message, bool clear) {
 }
 
 
-void BedTimeApp::displayCurrentTime() {
+void App::displayCurrentTime() {
     tmElements_t tm;
     short h, m;
 #ifdef TEENSYDUINO
@@ -154,7 +154,7 @@ void BedTimeApp::displayCurrentTime() {
  * We receive negative hours or minutes when the other
  * element is being setup / modified. A bit of nasty overloading, but hey. Whatever.
  */
-void BedTimeApp::displayTime(signed short h, signed short m) {
+void App::displayTime(signed short h, signed short m) {
     if (!screenOn && h >= 0 && m >= 0) return;
     matrix->clear();
     colonOn = !colonOn;
@@ -173,7 +173,7 @@ void BedTimeApp::displayTime(signed short h, signed short m) {
     matrix->writeDisplay();
 }
 
-void BedTimeApp::cb_ButtonClick() {
+void App::cb_ButtonClick() {
     Serial.print("Entering BedTimeApp::cb_ButtonClick, mode = ");
     Serial.println((int) mode);
     if (mode != SetTime::Default) {
@@ -187,7 +187,7 @@ void BedTimeApp::cb_ButtonClick() {
     }
 }
 
-void BedTimeApp::cb_ButtonDoubleClick() {
+void App::cb_ButtonDoubleClick() {
     if (mode != SetTime::Default) {
         mode = SetTime::Default;
         debug(0, "Cancel Setup", true);
@@ -196,7 +196,7 @@ void BedTimeApp::cb_ButtonDoubleClick() {
     }
 }
 
-void BedTimeApp::cb_ButtonHold() {
+void App::cb_ButtonHold() {
     Serial.print("Entering BedTimeApp::cb_ButtonHold, mode = ");
     Serial.println((int) mode);
     if (mode == SetTime::Default) {
@@ -209,7 +209,7 @@ void BedTimeApp::cb_ButtonHold() {
     }
 }
 
-void BedTimeApp::toggleNeoPixels() {
+void App::toggleNeoPixels() {
 #ifdef ENABLE_NEOPIXELS
     neoPixelsOn = !neoPixelsOn;
     if (neoPixelsOn) {
@@ -219,7 +219,7 @@ void BedTimeApp::toggleNeoPixels() {
     }
 #endif
 }
-void BedTimeApp::toggleDisplay() {
+void App::toggleDisplay() {
     screenOn = !screenOn;
     matrix->clear();
     matrix->writeDisplay();

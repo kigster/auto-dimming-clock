@@ -10,9 +10,9 @@
 #include "../Wallock.h"
 #ifdef ENABLE_MENU
 #include "SetTimeMenu.h"
-#include "../app/BedTimeApp.h"
+#include "../app/App.h"
 
-SetTimeMenu::SetTimeMenu(BedTimeApp *application) {
+SetTimeMenu::SetTimeMenu(App *application) {
     app = application;
     h = m = 0;
     what = "";
@@ -24,7 +24,7 @@ SetTimeMenu::SetTimeMenu() {
     what = "";
 }
 
-void SetTimeMenu::setApp(BedTimeApp *application) {
+void SetTimeMenu::setApp(App *application) {
     app = application;
 }
 
