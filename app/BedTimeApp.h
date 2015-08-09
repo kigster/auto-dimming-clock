@@ -11,22 +11,13 @@
 #ifndef BEDTIMEAPP_H_
 #define BEDTIMEAPP_H_
 
+#include "State.h"
+
 #include "../BedTime.h"
-#include <Arduino.h>
-#include <RotaryEncoderWithButton.h>
-#include <SimpleTimer.h>
-#include <Wire.h>
 
 #ifdef ENABLE_LCD
 #include <LiquidCrystal_I2C.h>
 #endif
-
-#include <Time.h>
-#include <DS1307RTC.h>
-
-#include <Adafruit_LEDBackpack.h>
-#include <Adafruit_GFX.h>
-#include <OneButton.h>
 
 #ifdef ENABLE_SET_TIME
 #include "../settingtime/SetTimeHelper.h"
@@ -37,6 +28,9 @@
 #include "../neopixel/NeoPixelManager.h"
 #include "../neopixel/NeoPixelEffects.h"
 #endif
+
+#define MAX_BRIGHTNESS 15
+#define MIN_BRIGHTNESS 0
 
 namespace SetTime {
     typedef enum TimeChangeMode_e {
@@ -54,12 +48,14 @@ typedef struct hardwareConfig_s {
     uint8_t pinRotaryRight;
     uint8_t pinRotaryButton;
     uint8_t pinNeoPixels;
+    State *state;
 } HardwareConfig;
 
 class BedTimeApp {
 public:
-    BedTimeApp(HardwareConfig config);
+    BedTimeApp(HardwareConfig *config);
 
+    State                       *state;
     Adafruit_7segment           *matrix;
     SetTime::TimeMode           mode;
 #ifdef ENABLE_LCD
@@ -75,19 +71,19 @@ public:
     NeoPixelManager             *neoPixelManager;
 #endif
     RotaryEncoderWithButton     *rotary;
-    HardwareConfig              config;
-    char                        buffer[128];
+    HardwareConfig              *config;
 
     void setup();
-    void setBrightness(signed short brightnessValue);
-    uint8_t getBrightness();
-    void adjustBrightness();
+    void run();
+
+    void refreshUI();
+    void readEnvironment();
 
     void displayTime(signed short h, signed short m);
+    void displayCurrentTime();
+
     void toggleDisplay();
     void toggleNeoPixels();
-    void getPhotoReading();
-    void displayCurrentTime();
     void neoPixelRefresh();
     void neoPixelNextEffect();
     // Callbacks
@@ -98,11 +94,13 @@ public:
     void debug(int row, const char *message, bool clear);
     void debug(const char *message);
 
-private:
-    bool colonOn, screenOn, neoPixelsOn;
-    uint8_t brightness;
-    uint16_t lastPhotoReading;
+    void readPhotoresitor();
+    void readKnob();
 
+private:
+
+    bool colonOn, screenOn, neoPixelsOn;
+    tmElements_t lastDisplayedTime;
 };
 
 #endif /* BEDTIMEAPP_H_ */

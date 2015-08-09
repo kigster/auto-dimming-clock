@@ -77,11 +77,11 @@ void SetTimeMenu::configureTime() {
     case SetTime::Save:
         tm.Hour = h;
         tm.Minute = m;
-        sprintf(app->buffer, "New Time: %2d:%02d", h, m);
+        sprintf(buffer, "New Time: %2d:%02d", h, m);
         Serial.print("Setting Time to: ");
-        Serial.println(app->buffer);
+        Serial.println(buffer);
         app->debug(0, "Saving New Time...", true);
-        app->debug(1, app->buffer, false);
+        app->debug(1, buffer, false);
         app->debug(3, "Success! :)", false);
         app->helper.setTimeTo(tm);
         nextMode();
@@ -122,8 +122,8 @@ void SetTimeMenu::selectNumber(signed short *current, int min, int max) {
                     (app->mode == SetTime::Hour ? h : -1),
                     (app->mode == SetTime::Minute ? m : -1)
                     );
-            sprintf(app->buffer, "%-7s: %2d:%02d", what, h, m);
-            app->debug(1, app->buffer, false);
+            sprintf(buffer, "%-7s: %2d:%02d", what, h, m);
+            app->debug(1, buffer, false);
             delay(30);
         }
     }

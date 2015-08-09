@@ -8,25 +8,27 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 
-#include "BedTimeApp.h"
 #include "../BedTime.h"
+#include "BedTimeApp.h"
 #include <Arduino.h>
 
-BedTimeApp::BedTimeApp(HardwareConfig configuration) {
-    config = configuration;
+BedTimeApp::BedTimeApp(HardwareConfig *_config) {
+//    memset(&lastDisplayedTime, 0x0, sizeof(tmElements_t));
+    config = _config;
+    state = config->state;
 #ifdef ENABLE_LCD
     lcd = new LiquidCrystal_I2C(0x3F, 20, 4);
 #endif
     screenOn = colonOn = true;
     mode = SetTime::Default;
 #ifdef ENABLE_NEOPIXELS
-    neoPixelManager = new NeoPixelManager(3, config.pinNeoPixels);
+    neoPixelManager = new NeoPixelManager(3, config->pinNeoPixels);
 #endif
-    rotary = new RotaryEncoderWithButton(config.pinRotaryLeft, config.pinRotaryRight, config.pinRotaryButton);
+    rotary = new RotaryEncoderWithButton(config->pinRotaryLeft, config->pinRotaryRight, config->pinRotaryButton);
     matrix = new Adafruit_7segment;
-    brightness = 15;
+    state->getDisplayBrightness()->setMinMax(0, 15);
+    state->getOutsideBrightness()->setMinMax(0, 1023);
     neoPixelsOn = false;
-    lastPhotoReading = 0;
 #ifdef ENABLE_MENU
     menu.setApp(this);
 #endif
@@ -39,7 +41,7 @@ void BedTimeApp::setup() {
     matrix->writeDisplay();
     delay(1000);
 #ifdef ENABLE_PHOTORESISTOR
-    pinMode(config.pinPhotoResistor, INPUT);
+    pinMode(config->pinPhotoResistor, INPUT);
 #endif
 
 #ifdef ENABLE_LCD
@@ -54,24 +56,41 @@ void BedTimeApp::setup() {
     neoPixelManager->begin();
 #endif
 }
-
-uint8_t BedTimeApp::getBrightness() {
-    return brightness;
+void BedTimeApp::run() {
+    rotary->tick();
+    matrix->setBrightness(15);
+    displayCurrentTime();
+//    readEnvironment();
+//    refreshUI();
+}
+void BedTimeApp::readEnvironment() {
+    readPhotoresitor();
+    readKnob();
 }
 
-void BedTimeApp::adjustBrightness() {
+void BedTimeApp::readKnob() {
     signed short delta = rotary->delta();
     if (delta != 0) {
-        setBrightness((signed short) getBrightness() + delta);
+        state->getDisplayBrightness()->addDeltaToCurrent(delta);
     }
 }
+void BedTimeApp::readPhotoresitor() {
+    uint32_t v = analogRead(config->pinPhotoResistor);
+    state->getOutsideBrightness()->setCurrent(v);
 
-void BedTimeApp::setBrightness(signed short brightnessValue) {
-    if (brightnessValue > 15) brightnessValue = 15;
-    if (brightnessValue < 0) brightnessValue = 0;
-    brightness = brightnessValue;
-    matrix->setBrightness(brightness);
-    sprintf(buffer, "Brightness[0-15]:%2d", brightness);
+#ifdef ENABLE_LCD
+    lcd->setCursor(0,2);
+    lcd->print("Photo Value: ");
+    sprintf(buffer, "%4d", v);
+    lcd->print(buffer);
+#endif
+}
+
+void BedTimeApp::refreshUI() {
+    state->getOutsideBrightness()->applyMyDeltaTo(state->getDisplayBrightness());
+    signed short currentBrightness = state->getDisplayBrightness()->getCurrent();
+//    matrix->setBrightness(currentBrightness);
+    sprintf(buffer, "refreshing screen brightness [0-15] to %2d", currentBrightness);
     debug(1, buffer, false);
 }
 
@@ -154,32 +173,6 @@ void BedTimeApp::displayTime(signed short h, signed short m) {
     matrix->writeDisplay();
 }
 
-void BedTimeApp::getPhotoReading() {
-
-    uint16_t v = analogRead(config.pinPhotoResistor);
-    if (lastPhotoReading == 0) {
-        lastPhotoReading = v;
-        return;
-    }
-
-    signed long delta = 8 * (v - lastPhotoReading) / 1024; // convert to brightness
-    if (delta != 0) {
-        Serial.print("PhotoResistor reading is: ");
-        Serial.print(v);
-        Serial.print(". Changing brightness from "); Serial.print(brightness);
-        Serial.print(" to "); Serial.println(delta);
-        setBrightness(brightness + delta);
-    }
-
-    lastPhotoReading = v;
-#ifdef ENABLE_LCD
-    lcd->setCursor(0,2);
-    lcd->print("Photo Value: ");
-    sprintf(buffer, "%4d", v);
-    lcd->print(buffer);
-#endif
-}
-
 void BedTimeApp::cb_ButtonClick() {
     Serial.print("Entering BedTimeApp::cb_ButtonClick, mode = ");
     Serial.println((int) mode);
@@ -234,4 +227,3 @@ void BedTimeApp::toggleDisplay() {
         displayCurrentTime();
     }
 }
-

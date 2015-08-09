@@ -166,10 +166,10 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.DTS/value=3600
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.LOCAL/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.LOCAL/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.LOCAL/value=1438972760
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.LOCAL/value=1439078964
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.UTC/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.UTC/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.UTC/value=1438997960
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.UTC/value=1439104164
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.ZONE/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.ZONE/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.ZONE/value=-28800
@@ -277,7 +277,7 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.RUNTI
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.RUNTIME.TOOLS.AVR-GCC.PATH/value=/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.RUNTIME.TOOLS.AVRDUDE.PATH/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.RUNTIME.TOOLS.AVRDUDE.PATH/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.RUNTIME.TOOLS.AVRDUDE.PATH/value=${A.COMPILER.PATH}
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.RUNTIME.TOOLS.AVRDUDE.PATH/value=${A.RUNTIME.TOOLS.AVR-GCC.PATH}
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.SOFTWARE/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.SOFTWARE/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.SOFTWARE/value=ARDUINO
@@ -292,10 +292,10 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.BOOTLOADER.PATTERN/value="${A.CMD.PATH}" "-C${A.CONFIG.PATH}" ${A.BOOTLOADER.VERBOSE} -p${A.BUILD.MCU} -c${A.PROTOCOL} ${A.PROGRAM.EXTRA_PARAMS} "-Uflash\:w\:${A.RUNTIME.PLATFORM.PATH}/bootloaders/${A.BOOTLOADER.FILE}\:i" -Ulock\:w\:${A.BOOTLOADER.LOCK_BITS}\:m
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.CMD.PATH/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.CMD.PATH/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.CMD.PATH/value=${A.PATH}/bin/avrdude
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.CMD.PATH/value=${A.PATH}/../bin/avrdude
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.CONFIG.PATH/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.CONFIG.PATH/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.CONFIG.PATH/value=${A.PATH}/etc/avrdude.conf
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.CONFIG.PATH/value=${A.PATH}/../etc/avrdude.conf
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.ERASE.PARAMS.QUIET/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.ERASE.PARAMS.QUIET/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.ERASE.PARAMS.QUIET/value=-q -q

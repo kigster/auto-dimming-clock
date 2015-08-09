@@ -3,7 +3,7 @@
  *
  * 7-Segment Display for current time, based on the RTC chip.
  *
- * Rotary encoder is used to change brightness, and set time. The button
+ * Rotary encoder is used to change s, and set time. The button
  * on rotary encoder is used in single click, double click and hold capacity
  * for various options. See README for more info.
  *
@@ -16,30 +16,28 @@
  */
 #include "BedTime.h"
 
-#include <RotaryEncoderWithButton.h>
-#include <SimpleTimer.h>
-#include <Wire.h>
-#include <Time.h>
-#include <DS1307RTC.h>
-#include <Adafruit_LEDBackpack.h>
-#include <Adafruit_GFX.h>
-#include <OneButton.h>
-
-
 #ifdef ENABLE_NEOPIXELS
 #include "neopixel/NeoPixelEffects.h"
 #include "neopixel/NeoPixelManager.h"
 #endif
+
 #include "app/BedTimeApp.h"
+#include "app/State.h"
+
+State state(new GaugedValue("display", 0, 15),
+            new GaugedValue("photoresistor", (1 << 0), (1 << 10)));
 
 HardwareConfig config = {
         A3,     // PhotoResistor
          2,     // Left Rotary
          3,     // Right Rotary
          4,     // Rotary Button
-         2      // NeoPixels
+         2,     // NeoPixels
+         &state
 };
-BedTimeApp app(config);
+
+char buffer[128];
+BedTimeApp app(&config);
 SimpleTimer timer(1);
 
 #ifdef TEENSYDUINO
@@ -68,7 +66,7 @@ void displayTimeNow(int timerId) {
 }
 void readPhotoResistor(int timerId) {
 #ifdef ENABLE_PHOTORESISTOR
-    app.getPhotoReading();
+    app.readPhotoresitor();
 #endif
 }
 void neoPixelRefresh(int timerId) {
@@ -89,8 +87,6 @@ void setup() {
 
     app.setup();
 
-    displayTimeNow(0);
-
     Serial.println("Establishing callbacks...");
 
     app.rotary->button.attachClick(rotaryButtonClick);
@@ -108,7 +104,7 @@ void setup() {
 #ifdef TEENSYDUINO
     if (year() < 2014) {
         Serial.println("[BLOOPERS!]");
-        Serial.print("Year returned is < 2014, resetting time to compile time, 12:00. Year: "); Serial.println(year());
+        Serial.prhint("Year returned is < 2014, resetting time to compile time, 12:00. Year: "); Serial.println(year());
         app.helper.setDateToCompileTime();
     } else {
         Serial.println("[OK]");
@@ -120,6 +116,9 @@ void setup() {
         if (!rtcResult) {
             Serial.println("RTC.read() returned false, resetting to compile time.");
             app.helper.setDateToCompileTime();
+        } else {
+            sprintf(buffer, "RTC.read() successful, booting at %d/%d/%d %d:%d", tm.Month, tm.Day, tm.Year, tm.Hour, tm.Second);
+            Serial.println(buffer);
         }
     } else {
         Serial.println("RTC chip was not detected.");
@@ -142,7 +141,6 @@ void setup() {
 
 void loop() {
     timer.run();
-    app.rotary->tick();
-    app.adjustBrightness();
+    app.run();
     delay(10);
 }

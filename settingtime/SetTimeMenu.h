@@ -14,9 +14,6 @@
 #ifndef SETTIMEMENU_H_
 #define SETTIMEMENU_H_
 
-#include <Arduino.h>
-#include <DS1307RTC.h>
-
 class BedTimeApp;
 
 class SetTimeMenu {
