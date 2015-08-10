@@ -29,35 +29,25 @@ namespace Wallock {
     public:
         GaugedValue(const char *_name, unsigned short _min, unsigned short _max, unsigned int _increment) {
             name        = (char *)_name;
-            min         = _min;
-            max         = _max;
+            setMinMax(_min, _max);
+
             changed     = false;
-            current     = 0;
+            current     = (max - min) / 2;
             increment   = _increment;
 
-            setMinMax(0, 0);
         }
-        bool isInitialized() {
-            return !(abs(current) + abs(min) + abs(max) == 0);
-        }
-
         signed int getCurrent() {
             return current;
         }
 
-        signed int delta() {
-            return current - lastValue;
-        }
-
         bool setCurrent(signed int newValue) {
-            time_t rightNow = now();
             changed = false;
 
             // if the difference exceeds increment reduce down to increment itself.
             // this allows to cap any "jumps" in values
             if (abs(newValue - lastValue) > abs(increment)) {
                 // too large of a change, default to our increment.
-                signed int sign = abs(newValue - lastValue) / (newValue - lastValue);
+                signed short sign =  (signed short) abs(newValue) / newValue;
                 newValue = lastValue + sign * increment;
             } else if (abs(newValue - lastValue) < abs(increment)) {
                 // insufficient change, so no change at all
@@ -93,13 +83,14 @@ namespace Wallock {
             return ((float) 100.0 * current / (float) (max - min));
         }
         float lastDeltaPercent() {
-            return ((float) 100.0 * (current - lastValue) / (max - min));
+            return ((float) 100.0 * ((float) current - lastValue) / (float) (max - min));
         }
+
         bool addDeltaToCurrent(signed int delta) {
-            return setCurrent(current += delta);
+            return setCurrent((signed int) current + delta);
         }
         bool applyDeltaPercent(float deltaPerc) {
-            return addDeltaToCurrent((deltaPerc / 100.0 * (max - min) ));
+            return addDeltaToCurrent(( (signed int) (((float) max - min) * deltaPerc / 100.0  )));
         }
         bool applyMyDeltaTo(GaugedValue *another) {
             return another->applyDeltaPercent(this->lastDeltaPercent());

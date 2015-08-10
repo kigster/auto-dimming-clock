@@ -12,8 +12,6 @@
 #include "../Wallock.h"
 #include "App.h"
 
-#define INITIAL_BRIGHTNESS 7
-
 namespace Wallock {
     App::App(       PinoutMapping               &_pinout,
                     State                       &_state,
@@ -29,11 +27,6 @@ namespace Wallock {
 
         screenOn = colonOn = true;
         mode = SetTime::Default;
-
-        state.getDisplayBrightness().setMinMax(0, 15);
-        state.getDisplayBrightness().setCurrent(INITIAL_BRIGHTNESS);
-
-        state.getPhotoresistorReading().setMinMax(0, 1023);
 
         neoPixelsOn = false;
     #ifdef ENABLE_LCD
@@ -72,19 +65,14 @@ namespace Wallock {
     }
 
     void App::run() {
+//        readPhotoresitor();
         rotary.tick();
-        readEnvironment();
-    //    refreshUI();
-    }
-    void App::readEnvironment() {
-        readPhotoresitor();
         readKnob();
     }
 
     void App::readKnob() {
-        signed short delta = rotary.delta();
+        signed long delta = rotary.delta();
         if (delta != 0) {
-
             if (state.getDisplayBrightness().addDeltaToCurrent(delta)) {
                 changeDisplayBrightness();
             }
@@ -112,11 +100,6 @@ namespace Wallock {
     #endif
     }
 
-    void App::refreshUI() {
-//        state.getPhotoresistorReading().applyMyDeltaTo((GaugedValue *) &state.getDisplayBrightness());
-//        signed short currentBrightness = state.getDisplayBrightness().getCurrent();
-        // matrix.setBrightness(currentBrightness);
-    }
 
     void App::neoPixelRefresh() {
     #ifdef ENABLE_NEOPIXELS
@@ -171,8 +154,10 @@ namespace Wallock {
         if (h == 0) { h = 12; }
         m = tm.Minute;
         if (screenOn) displayTime(h, m);
-        Serial.print(F("Current time is "));
-        sprintf(buffer, "%2d:%02d:%02d %d/%02d/%d", h, m, tm.Second, tm.Month, tm.Day, 1970 + tm.Year);
+        Serial.print(F("> "));
+        sprintf(buffer, "%2d:%02d:%02d %d/%02d/%d, Brightness [%d], Photo [%d]", h, m, tm.Second, tm.Month, tm.Day, 1970 + tm.Year,
+                        state.getDisplayBrightness().getCurrent(),
+                        state.getPhotoresistorReading().getCurrent());
         debug(2, buffer, true);
     }
     /**

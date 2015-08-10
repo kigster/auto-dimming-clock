@@ -21,8 +21,6 @@
 char buffer[80];
 
 Wallock::GaugedValue brightnessGauge("brightness", 0, 15, 1);
-
-// value 500 was obtained imperically by seeing
 Wallock::GaugedValue photoGauge("photo-value", 0, 480, 30);
 
 Wallock::PinoutMapping pinout = {
