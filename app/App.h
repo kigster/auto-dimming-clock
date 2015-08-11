@@ -67,18 +67,19 @@ namespace Wallock {
                             Adafruit_7segment           &_matrix);
 
             SetTime::TimeMode mode;
-        #ifdef ENABLE_LCD
-            LiquidCrystal_I2C *lcd;  // set the LCD address to 0x27 for a 16 chars and 2 line display
-        #endif
-        #ifdef ENABLE_MENU
-            SetTimeMenu menu;
-        #endif
-        #ifdef ENABLE_SET_TIME
-            SetTimeHelper helper;
-        #endif
-        #ifdef ENABLE_NEOPIXELS
-            NeoPixelManager *neoPixelManager;
-        #endif
+
+            #ifdef ENABLE_LCD
+                LiquidCrystal_I2C *lcd;  // set the LCD address to 0x27 for a 16 chars and 2 line display
+            #endif
+            #ifdef ENABLE_MENU
+                SetTimeMenu menu;
+            #endif
+            #ifdef ENABLE_SET_TIME
+                SetTimeHelper helper;
+            #endif
+            #ifdef ENABLE_NEOPIXELS
+                NeoPixelManager *neoPixelManager;
+            #endif
 
 
             void setup();

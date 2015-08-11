@@ -19,7 +19,7 @@ namespace Wallock {
                     Adafruit_7segment           &_matrix) :
 
                     pinout(_pinout),
-                    state(_state),
+                    state (_state),
                     rotary(_rotary),
                     matrix(_matrix),
                     button(_rotary.button)
@@ -29,15 +29,15 @@ namespace Wallock {
         mode = SetTime::Default;
 
         neoPixelsOn = false;
-    #ifdef ENABLE_LCD
-        lcd = new LiquidCrystal_I2C(0x3F, 20, 4);
-    #endif
-    #ifdef ENABLE_NEOPIXELS
-        neoPixelManager = new NeoPixelManager(3, pinout.pinNeoPixels);
-    #endif
-    #ifdef ENABLE_MENU
-        menu.setApp(this);
-    #endif
+        #ifdef ENABLE_LCD
+            lcd = new LiquidCrystal_I2C(0x3F, 20, 4);
+        #endif
+        #ifdef ENABLE_NEOPIXELS
+            neoPixelManager = new NeoPixelManager(3, pinout.pinNeoPixels);
+        #endif
+        #ifdef ENABLE_MENU
+            menu.setApp(this);
+        #endif
     }
 
     void App::setup() {
@@ -47,21 +47,21 @@ namespace Wallock {
         matrix.writeDisplay();
         changeDisplayBrightness();
         delay(1000);
-    #ifdef ENABLE_PHOTORESISTOR
-        pinMode(pinout.pinPhotoResistor, INPUT);
-    #endif
+        #ifdef ENABLE_PHOTORESISTOR
+            pinMode(pinout.pinPhotoResistor, INPUT);
+        #endif
 
-    #ifdef ENABLE_LCD
-        lcd->init();
-        // Print a message to the LCD.
-        lcd->backlight();
-        debug(1, "Clock-A-Roma v1.0", true);
-        debug(2, "Initialization completedl", true);
-    #endif
+        #ifdef ENABLE_LCD
+            lcd->init();
+            // Print a message to the LCD.
+            lcd->backlight();
+            debug(1, "Clock-A-Roma v1.0", true);
+            debug(2, "Initialization completedl", true);
+        #endif
 
-    #ifdef ENABLE_NEOPIXELS
-        neoPixelManager->begin();
-    #endif
+        #ifdef ENABLE_NEOPIXELS
+            neoPixelManager->begin();
+        #endif
     }
 
     void App::run() {
@@ -92,26 +92,26 @@ namespace Wallock {
                 changeDisplayBrightness();
         }
 
-    #ifdef ENABLE_LCD
-        lcd->setCursor(0,2);
-        lcd->print("Photo Value: ");
-        sprintf(buffer, "%4d", v);
-        lcd->print(buffer);
-    #endif
+        #ifdef ENABLE_LCD
+            lcd->setCursor(0,2);
+            lcd->print("Photo Value: ");
+            sprintf(buffer, "%4d", v);
+            lcd->print(buffer);
+        #endif
     }
 
 
     void App::neoPixelRefresh() {
-    #ifdef ENABLE_NEOPIXELS
-        if (neoPixelsOn)
-            neoPixelManager->refreshEffect();
-    #endif
+        #ifdef ENABLE_NEOPIXELS
+            if (neoPixelsOn)
+                neoPixelManager->refreshEffect();
+        #endif
     }
     void App::neoPixelNextEffect() {
-    #ifdef ENABLE_NEOPIXELS
-        if (neoPixelsOn)
-            neoPixelManager->nextEffect();
-    #endif
+        #ifdef ENABLE_NEOPIXELS
+            if (neoPixelsOn)
+                neoPixelManager->nextEffect();
+        #endif
     }
 
     void App::debug(const char *message) {
@@ -119,43 +119,45 @@ namespace Wallock {
     }
 
     void App::debug(int row, const char *message, bool clear) {
-    #ifdef ENABLE_LCD
-        if (clear)
-            lcd->clear();
-        row = row % 4;
-        lcd->setCursor(0, row);
-        lcd->print(message);
-    #endif
+        #ifdef ENABLE_LCD
+            if (clear)
+                lcd->clear();
+            row = row % 4;
+            lcd->setCursor(0, row);
+            lcd->print(message);
+        #endif
         Serial.println(message);
     }
-
 
     void App::displayCurrentTime() {
         tmElements_t tm;
         short h, m;
-    #ifdef TEENSYDUINO
-        breakTime(now(), tm);
-    #else
-        if (!RTC.read(tm)) {
-            if (RTC.chipPresent()) {
-                debug(1, "Time chip detected, but not set. Resetting", true);
-    #ifdef ENABLE_SET_TIME
-                helper.setDateToCompileTime();
-    #endif
-            } else {
-                matrix.printError();
-                debug(1, "Time chip not detected", true);
-                colonOn = !colonOn;
+
+        #ifdef TEENSYDUINO
+            breakTime(now(), tm);
+        #else
+            if (!RTC.read(tm)) {
+                if (RTC.chipPresent()) {
+                    debug(1, "Time chip detected, but not set. Resetting", true);
+                    #ifdef ENABLE_SET_TIME
+                        helper.setDateToCompileTime();
+                    #endif
+                } else {
+                    matrix.printError();
+                    debug(1, "Time chip not detected", true);
+                    colonOn = !colonOn;
+                }
+                return;
             }
-            return;
-        }
-    #endif
+        #endif
+
         h = tm.Hour % 12;
         if (h == 0) { h = 12; }
         m = tm.Minute;
         if (screenOn) displayTime(h, m);
         Serial.print(F("> "));
-        sprintf(buffer, "%2d:%02d:%02d %d/%02d/%d, Brightness [%d], Photo [%d]", h, m, tm.Second, tm.Month, tm.Day, 1970 + tm.Year,
+        sprintf(buffer, "%2d:%02d:%02d %d/%02d/%d, Brightness [%d], Photo [%d]",
+                        h, m, tm.Second, tm.Month, tm.Day, 1970 + tm.Year,
                         state.getDisplayBrightness().getCurrent(),
                         state.getPhotoresistorReading().getCurrent());
         debug(2, buffer, true);
@@ -187,13 +189,13 @@ namespace Wallock {
         Serial.print(F("Entering BedTimeApp::cb_ButtonClick, mode = "));
         Serial.println((int) mode);
         if (mode != SetTime::Default) {
-    #ifdef ENABLE_MENU
-            menu.nextMode();
-    #endif
+            #ifdef ENABLE_MENU
+                menu.nextMode();
+            #endif
         } else {
-    #ifdef ENABLE_NEOPIXELS
-            toggleNeoPixels();
-    #endif
+            #ifdef ENABLE_NEOPIXELS
+                toggleNeoPixels();
+            #endif
         }
     }
 
@@ -220,14 +222,14 @@ namespace Wallock {
     }
 
     void App::toggleNeoPixels() {
-    #ifdef ENABLE_NEOPIXELS
-        neoPixelsOn = !neoPixelsOn;
-        if (neoPixelsOn) {
-            neoPixelManager->nextEffect();
-        } else {
-            neoPixelManager->shutoff();
-        }
-    #endif
+        #ifdef ENABLE_NEOPIXELS
+            neoPixelsOn = !neoPixelsOn;
+            if (neoPixelsOn) {
+                neoPixelManager->nextEffect();
+            } else {
+                neoPixelManager->shutoff();
+            }
+        #endif
     }
     void App::toggleDisplay() {
         screenOn = !screenOn;
