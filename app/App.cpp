@@ -27,6 +27,7 @@ namespace Wallock {
 
         screenOn = colonOn = true;
         mode = SetTime::Default;
+        photoOffsetPercentage = lastPhotoValue = currentPhotoValue = lastDisplayedTime = 0;
 
         neoPixelsOn = false;
         #ifdef ENABLE_LCD
@@ -42,11 +43,9 @@ namespace Wallock {
 
     void App::setup() {
         matrix.begin(0x70);
+        delay(100);
         matrix.clear();
-        matrix.print(0x0000, HEX);
-        matrix.writeDisplay();
-        changeDisplayBrightness();
-        delay(1000);
+        brightnessChangedEvent();
         #ifdef ENABLE_PHOTORESISTOR
             pinMode(pinout.pinPhotoResistor, INPUT);
         #endif
@@ -65,31 +64,43 @@ namespace Wallock {
     }
 
     void App::run() {
-//        readPhotoresitor();
         rotary.tick();
-        readKnob();
+        processKnobEvents();
+        processPhotoresistorChange();
     }
 
-    void App::readKnob() {
+    bool App::processKnobEvents() {
         signed long delta = rotary.delta();
         if (delta != 0) {
-            if (state.getDisplayBrightness().addDeltaToCurrent(delta)) {
-                changeDisplayBrightness();
+            // normalize knob to increments of 1
+            delta = delta / abs(delta);
+            if (state.getDisplayBrightness().changeBy(delta)) {
+                brightnessChangedEvent();
+                photoOffsetPercentage = state.getDisplayBrightness().getLastChangeAsPercentOfRange();
+                return true;
             }
         }
+        return false;
     }
 
-    void App::changeDisplayBrightness() {
-        matrix.setBrightness(state.getDisplayBrightness().getCurrent());
-    }
-
-    void App::readPhotoresitor() {
+    bool App::processPhotoresistorChange() {
         GaugedValue &photo = state.getPhotoresistorReading();
-        GaugedValue &display = state.getDisplayBrightness();
-
-        if (photo.setCurrent(analogRead(pinout.pinPhotoResistor)) ) {
-            if (display.applyDeltaPercent(photo.lastDeltaPercent()))
-                changeDisplayBrightness();
+        currentPhotoValue = analogRead(pinout.pinPhotoResistor);
+        #ifdef DEBUG
+            if (millis() - lastDisplayedTime > 1000) {
+                Serial.print("photoresistor readout [0-1023]: ");
+                Serial.println(currentPhotoValue);
+                lastDisplayedTime = millis();
+            }
+        #endif
+        if (currentPhotoValue != lastPhotoValue) {
+            if (photo.setCurrent(currentPhotoValue) ) {
+                GaugedValue &display = state.getDisplayBrightness();
+                if (display.follow(&photo, photoOffsetPercentage)) {
+                    brightnessChangedEvent();
+                    return true;
+                }
+            }
         }
 
         #ifdef ENABLE_LCD
@@ -98,7 +109,14 @@ namespace Wallock {
             sprintf(buffer, "%4d", v);
             lcd->print(buffer);
         #endif
+
+        return false;
     }
+
+    void App::brightnessChangedEvent() {
+        matrix.setBrightness(state.getDisplayBrightness().getCurrent());
+    }
+
 
 
     void App::neoPixelRefresh() {
@@ -222,7 +240,7 @@ namespace Wallock {
     }
 
     void App::toggleNeoPixels() {
-        #ifdef ENABLE_NEOPIXELS
+         #ifdef ENABLE_NEOPIXELS
             neoPixelsOn = !neoPixelsOn;
             if (neoPixelsOn) {
                 neoPixelManager->nextEffect();

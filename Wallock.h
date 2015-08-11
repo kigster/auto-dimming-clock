@@ -18,7 +18,7 @@
     //#define ENABLE_LCD
     //#define ENABLE_NEOPIXELS
 
-    #define DEBUG 1
+    //#define DEBUG 1
 
 #endif
 

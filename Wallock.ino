@@ -32,7 +32,10 @@ Wallock::PinoutMapping pinout = {
 };
 
 Wallock::State state(photoGauge, brightnessGauge);
-RotaryEncoderWithButton rotary((uint8_t) pinout.pinRotaryLeft, (uint8_t) pinout.pinRotaryRight, (uint8_t) pinout.pinRotaryButton);
+RotaryEncoderWithButton rotary(
+                (uint8_t) pinout.pinRotaryLeft,
+                (uint8_t) pinout.pinRotaryRight,
+                (uint8_t) pinout.pinRotaryButton);
 Adafruit_7segment matrix;
 
 Wallock::App app(pinout, state, rotary, matrix);
@@ -69,7 +72,7 @@ void displayTimeNow(int timerId) {
 }
 void readPhotoResistor(int timerId) {
 #ifdef ENABLE_PHOTORESISTOR
-    app.readPhotoresitor();
+    app.processPhotoresistorChange();
 #endif
 }
 void neoPixelRefresh(int timerId) {

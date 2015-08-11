@@ -56,9 +56,11 @@ namespace Wallock {
             Adafruit_7segment                           &matrix;
             OneButton                                   &button;
 
-            tmElements_t                                lastDisplayedTime;
+            uint32_t                                    lastDisplayedTime;
 
             bool                                        colonOn, screenOn, neoPixelsOn;
+            int                                         lastPhotoValue, currentPhotoValue;
+            float                                       photoOffsetPercentage;
 
         public:
             App(            PinoutMapping               &_pinout,
@@ -87,7 +89,7 @@ namespace Wallock {
 
             void refreshUI();
             void readEnvironment();
-            void changeDisplayBrightness();
+            void brightnessChangedEvent();
 
             void displayTime(signed short h, signed short m);
             void displayCurrentTime();
@@ -104,8 +106,8 @@ namespace Wallock {
             void debug(int row, const char *message, bool clear);
             void debug(const char *message);
 
-            void readPhotoresitor();
-            void readKnob();
+            bool processPhotoresistorChange();
+            bool processKnobEvents();
 
             OneButton* getButton();
             RotaryEncoderWithButton *getRotary();

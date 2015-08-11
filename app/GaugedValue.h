@@ -17,24 +17,29 @@ const static int PRINT_WAIT_MS = 100;
 namespace Wallock {
     class GaugedValue {
     private:
-        signed int current;
-        signed int lastValue;
-        signed int max;
-        signed int min;
-        signed int increment;
-        bool changed;
+        unsigned int current;
+        unsigned int lastValue;
+        unsigned int max;
+        unsigned int min;
+        unsigned int increment;
         unsigned long lastChangedEpoch;
         unsigned long lastPrintedEpoch;
-        const char * name;
+        bool changed;
+        const char *name;
     public:
-        GaugedValue(const char *_name, unsigned short _min, unsigned short _max, unsigned int _increment) {
+        GaugedValue    (const char *_name,
+                        unsigned int _min,
+                        unsigned int _max,
+                        unsigned int _increment) {
+
             name        = (char *)_name;
-            setMinMax(_min, _max);
+            min         = _min;
+            max         = _max;
+            increment   = _increment;
 
             changed     = false;
             current     = (max - min) / 2;
-            increment   = _increment;
-
+            lastChangedEpoch = lastPrintedEpoch = current = lastValue = 0;
         }
         signed int getCurrent() {
             return current;
@@ -45,55 +50,49 @@ namespace Wallock {
 
             // if the difference exceeds increment reduce down to increment itself.
             // this allows to cap any "jumps" in values
-            if (abs(newValue - lastValue) > abs(increment)) {
-                // too large of a change, default to our increment.
-                signed short sign =  (signed short) abs(newValue) / newValue;
-                newValue = lastValue + sign * increment;
-            } else if (abs(newValue - lastValue) < abs(increment)) {
+            signed int delta = newValue - lastValue;
+            if (abs(delta) < increment) {
                 // insufficient change, so no change at all
                 newValue = lastValue;
             }
 
-            if (newValue > max)             newValue = max;
-            else if (newValue < min)        newValue = min;
+            if (newValue      >= (signed int) max)        newValue = max;
+            else if (newValue <= (signed int) min)        newValue = min;
 
-            if (newValue != lastValue) {
+            if ((unsigned int) newValue != lastValue) {
                 changed = true;
 
                 lastValue = current;
-                current = newValue;
-
+                current = (unsigned int) newValue;
+                lastChangedEpoch = millis();
                 sprintf(buffer, "%s: %4d --> %4d", name, lastValue, newValue);
                 Serial.println(buffer);
             }
 
             return changed;
         }
-        void setMinMax(signed int  _min, signed int  _max) {
-            min = _min;
-            max = _max;
-        }
-        void setMin(signed int  _min) {
-            min = _min;
-        }
-        void setMax(signed int  _max) {
-            max = _max;
-        }
-        float getCurrentPerc() {
+        float getCurrentAsPercentOfRange() {
             return ((float) 100.0 * current / (float) (max - min));
         }
-        float lastDeltaPercent() {
-            return ((float) 100.0 * ((float) current - lastValue) / (float) (max - min));
+        bool setCurrentAsPercentOfRange(float newCurrentValuePercent) {
+            return setCurrent((signed int) (newCurrentValuePercent / 100.0 * (float) (max - min)));
         }
-
-        bool addDeltaToCurrent(signed int delta) {
+        float getLastChangeAsPercentOfRange() {
+            return (100.0 * ((float) current - (float) lastValue) / (float) (max - min));
+        }
+        bool changeBy(signed int delta) {
             return setCurrent((signed int) current + delta);
         }
-        bool applyDeltaPercent(float deltaPerc) {
-            return addDeltaToCurrent(( (signed int) (((float) max - min) * deltaPerc / 100.0  )));
+        bool changeByPercent(float deltaPerc) {
+            return changeBy((signed int) floor((float) (max - min) * (deltaPerc / 100.0)));
         }
-        bool applyMyDeltaTo(GaugedValue *another) {
-            return another->applyDeltaPercent(this->lastDeltaPercent());
+        bool follow(GaugedValue *another) {
+            return setCurrentAsPercentOfRange(another->getCurrentAsPercentOfRange());
+        }
+        bool follow(GaugedValue *another, float offsetPercentage) {
+            float newPercentageValue = another->getCurrentAsPercentOfRange() + offsetPercentage;
+            newPercentageValue = max(min(newPercentageValue, 100.0), 0);
+            return setCurrentAsPercentOfRange(newPercentageValue);
         }
     };
 };
