@@ -76,7 +76,7 @@ namespace Wallock {
             delta = delta / abs(delta);
             if (state.getDisplayBrightness().changeBy(delta)) {
                 brightnessChangedEvent();
-                photoOffsetPercentage = state.getDisplayBrightness().getLastChangeAsPercentOfRange();
+                state.getPhotoresistorReading().syncTo(&state.getDisplayBrightness());
                 return true;
             }
         }
@@ -85,7 +85,10 @@ namespace Wallock {
 
     bool App::processPhotoresistorChange() {
         GaugedValue &photo = state.getPhotoresistorReading();
+        GaugedValue &display = state.getDisplayBrightness();
+
         currentPhotoValue = analogRead(pinout.pinPhotoResistor);
+
         #ifdef DEBUG
             if (millis() - lastDisplayedTime > 1000) {
                 Serial.print("photoresistor readout [0-1023]: ");
@@ -93,10 +96,10 @@ namespace Wallock {
                 lastDisplayedTime = millis();
             }
         #endif
+
         if (currentPhotoValue != lastPhotoValue) {
             if (photo.setCurrent(currentPhotoValue) ) {
-                GaugedValue &display = state.getDisplayBrightness();
-                if (display.follow(&photo, photoOffsetPercentage)) {
+                if (display.follow(&photo)) {
                     brightnessChangedEvent();
                     return true;
                 }

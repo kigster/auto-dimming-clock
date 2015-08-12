@@ -20,8 +20,8 @@
 
 char buffer[80];
 
-Wallock::GaugedValue brightnessGauge("brightness", 0, 15, 1);
-Wallock::GaugedValue photoGauge("photo-value", 0, 480, 30);
+Wallock::GaugedValue brightnessGauge("brightness", 0, 15, 1, true);
+Wallock::GaugedValue photoGauge("photo-value", 0, 1023, 64, false);
 
 Wallock::PinoutMapping pinout = {
         A3,     // PhotoResistor

@@ -22,24 +22,30 @@ namespace Wallock {
         unsigned int max;
         unsigned int min;
         unsigned int increment;
+        bool lockChangeToSingleIncrement;
         unsigned long lastChangedEpoch;
         unsigned long lastPrintedEpoch;
         bool changed;
         const char *name;
+        float percentOffset;
     public:
         GaugedValue    (const char *_name,
                         unsigned int _min,
                         unsigned int _max,
-                        unsigned int _increment) {
+                        unsigned int _increment,
+                        bool _lockChangeToSingleIncrement) {
 
             name        = (char *)_name;
             min         = _min;
             max         = _max;
             increment   = _increment;
+            lockChangeToSingleIncrement = _lockChangeToSingleIncrement;
 
             changed     = false;
             current     = (max - min) / 2;
             lastChangedEpoch = lastPrintedEpoch = current = lastValue = 0;
+            percentOffset = 0.0;
+
         }
         signed int getCurrent() {
             return current;
@@ -54,6 +60,8 @@ namespace Wallock {
             if (abs(delta) < increment) {
                 // insufficient change, so no change at all
                 newValue = lastValue;
+            } else if (abs(delta) > increment && lockChangeToSingleIncrement) {
+                newValue = newValue + (delta/abs(delta)) * increment;
             }
 
             if (newValue      >= (signed int) max)        newValue = max;
@@ -65,7 +73,7 @@ namespace Wallock {
                 lastValue = current;
                 current = (unsigned int) newValue;
                 lastChangedEpoch = millis();
-                sprintf(buffer, "%s: %4d --> %4d", name, lastValue, newValue);
+                sprintf(buffer, "%s: %4d --> %4d ", name, lastValue, current);
                 Serial.println(buffer);
             }
 
@@ -74,8 +82,11 @@ namespace Wallock {
         float getCurrentAsPercentOfRange() {
             return ((float) 100.0 * current / (float) (max - min));
         }
-        bool setCurrentAsPercentOfRange(float newCurrentValuePercent) {
-            return setCurrent((signed int) (newCurrentValuePercent / 100.0 * (float) (max - min)));
+        float getCurrentAsPercentOfRangeWithOffset() {
+            return max(min(((float) 100.0 * current / (float) (max - min) - percentOffset), 100), 0);
+        }
+        bool setCurrentAsPercentOfRange(float newValue) {
+            return setCurrent( (signed int) ((newValue) / 100.0 * (float) (max - min)));
         }
         float getLastChangeAsPercentOfRange() {
             return (100.0 * ((float) current - (float) lastValue) / (float) (max - min));
@@ -86,13 +97,12 @@ namespace Wallock {
         bool changeByPercent(float deltaPerc) {
             return changeBy((signed int) floor((float) (max - min) * (deltaPerc / 100.0)));
         }
-        bool follow(GaugedValue *another) {
-            return setCurrentAsPercentOfRange(another->getCurrentAsPercentOfRange());
+        bool syncTo(GaugedValue *another) {
+            percentOffset = getCurrentAsPercentOfRange() - another->getCurrentAsPercentOfRange();
+            percentOffset = max(min(percentOffset, 100.0), -100);
         }
-        bool follow(GaugedValue *another, float offsetPercentage) {
-            float newPercentageValue = another->getCurrentAsPercentOfRange() + offsetPercentage;
-            newPercentageValue = max(min(newPercentageValue, 100.0), 0);
-            return setCurrentAsPercentOfRange(newPercentageValue);
+        bool follow(GaugedValue *another) {
+            return setCurrentAsPercentOfRange(another->getCurrentAsPercentOfRangeWithOffset());
         }
     };
 };

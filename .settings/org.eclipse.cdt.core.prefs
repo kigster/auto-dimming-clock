@@ -166,10 +166,10 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.DTS/value=3600
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.LOCAL/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.LOCAL/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.LOCAL/value=1439235282
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.LOCAL/value=1439343434
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.UTC/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.UTC/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.UTC/value=1439260482
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.UTC/value=1439368634
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.ZONE/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.ZONE/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.ZONE/value=-28800
@@ -361,7 +361,7 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.BUILD_VARIANT/value=eightanaloginputs
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PORT/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PORT/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PORT/value=/dev/tty.usbserial-AH02MB22
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PORT/value=/dev/tty.usbserial-A702U4QB
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PROGMR/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PROGMR/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PROGMR/value=Default
