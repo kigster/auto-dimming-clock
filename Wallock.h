@@ -25,13 +25,13 @@
 #include "Arduino.h"
 
 #include <RotaryEncoderWithButton.h>
-#include <SimpleTimer.h>
 #include <Wire.h>
 #include <Time.h>
 #include <DS1307RTC.h>
 #include <Adafruit_LEDBackpack.h>
 #include <Adafruit_GFX.h>
 #include <OneButton.h>
+#include <SimpleTimer.h>
 
 
 extern char buffer[];

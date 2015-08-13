@@ -14,6 +14,7 @@
  *
  * Author: Konstantin Gredeskoul <kigster@gmail.com>
  */
+
 #include "Wallock.h"
 #include "app/App.h"
 #include "app/State.h"
@@ -39,7 +40,7 @@ RotaryEncoderWithButton rotary(
 Adafruit_7segment matrix;
 
 Wallock::App app(pinout, state, rotary, matrix);
-SimpleTimer timer(1);
+SimpleTimer timer;
 
 #ifdef ENABLE_NEOPIXELS
 #include "neopixel/NeoPixelEffects.h"
@@ -67,18 +68,18 @@ void rotaryButtonLongPress() {
     app.cb_ButtonHold();
     delay(100);
 }
-void displayTimeNow(int timerId) {
+void displayTimeNow() {
     app.displayCurrentTime();
 }
-void readPhotoResistor(int timerId) {
+void readPhotoResistor() {
 #ifdef ENABLE_PHOTORESISTOR
     app.processPhotoresistorChange();
 #endif
 }
-void neoPixelRefresh(int timerId) {
+void neoPixelRefresh() {
     app.neoPixelRefresh();
 }
-void neoPixelNextEffect(int timerId) {
+void neoPixelNextEffect() {
     app.neoPixelNextEffect();
 }
 
@@ -116,10 +117,10 @@ void setup() {
     app.getButton()->attachLongPressStart(rotaryButtonLongPress);
     app.getButton()->attachDoubleClick(rotaryButtonDoubleClick);
 
-    timer.setInterval( 1000, displayTimeNow);
-    timer.setInterval( 2000, readPhotoResistor);
-    timer.setInterval( 5000, neoPixelNextEffect);
-    timer.setInterval(    5, neoPixelRefresh);
+    timer.setInterval( 1000, (timer_callback) displayTimeNow);
+    timer.setInterval( 2000, (timer_callback) readPhotoResistor);
+    timer.setInterval( 5000, (timer_callback) neoPixelNextEffect);
+    timer.setInterval(    5, (timer_callback) neoPixelRefresh);
 
 
 #ifdef ENABLE_SET_TIME

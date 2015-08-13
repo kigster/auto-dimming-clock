@@ -27,14 +27,14 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>Libraries/Adafruit-GFX-Library</name>
+			<name>Libraries/Adafruit_GFX</name>
 			<type>2</type>
-			<locationURI>ArduinoPrivateLibPath/Adafruit-GFX-Library</locationURI>
+			<locationURI>ArduinoPrivateLibPath/Adafruit_GFX</locationURI>
 		</link>
 		<link>
-			<name>Libraries/Adafruit-LED-Backpack-Library</name>
+			<name>Libraries/Adafruit_LEDBackpack</name>
 			<type>2</type>
-			<locationURI>ArduinoPrivateLibPath/Adafruit-LED-Backpack-Library</locationURI>
+			<locationURI>ArduinoPrivateLibPath/Adafruit_LEDBackpack</locationURI>
 		</link>
 		<link>
 			<name>Libraries/Adafruit_NeoPixel</name>
@@ -90,15 +90,15 @@
 	<variableList>
 		<variable>
 			<name>ArduinoHardwareLibPath</name>
-			<value>file:/Applications/Arduino%201.6.4.app/Contents/Java/hardware/arduino/avr/libraries</value>
+			<value>file:/Applications/Arduino%201.6.5.app/Contents/Java/hardware/arduino/avr/libraries</value>
 		</variable>
 		<variable>
 			<name>ArduinoPinPath</name>
-			<value>file:/Applications/Arduino%201.6.4.app/Contents/Java/hardware/arduino/avr/variants</value>
+			<value>file:/Applications/Arduino%201.6.5.app/Contents/Java/hardware/arduino/avr/variants</value>
 		</variable>
 		<variable>
 			<name>ArduinoPlatformPath</name>
-			<value>file:/Applications/Arduino%201.6.4.app/Contents/Java/hardware/arduino/avr/cores</value>
+			<value>file:/Applications/Arduino%201.6.5.app/Contents/Java/hardware/arduino/avr/cores</value>
 		</variable>
 	</variableList>
 </projectDescription>
