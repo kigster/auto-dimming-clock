@@ -61,7 +61,7 @@ namespace Wallock {
                 // insufficient change, so no change at all
                 newValue = lastValue;
             } else if (abs(delta) > increment && lockChangeToSingleIncrement) {
-                newValue = newValue + (delta/abs(delta)) * increment;
+                newValue = current + (delta/abs(delta)) * increment;
             }
 
             if (newValue      >= (signed int) max)        newValue = max;
@@ -73,8 +73,8 @@ namespace Wallock {
                 lastValue = current;
                 current = (unsigned int) newValue;
                 lastChangedEpoch = millis();
-                sprintf(buffer, "%s: %4d --> %4d ", name, lastValue, current);
-                Serial.println(buffer);
+                sprintf(buffer, "%s: [%4d]-->[%4d] offset [%4d] ", name, lastValue, current, (short) floor(percentOffset));
+                Serial.print(buffer);
             }
 
             return changed;
@@ -97,7 +97,7 @@ namespace Wallock {
         bool changeByPercent(float deltaPerc) {
             return changeBy((signed int) floor((float) (max - min) * (deltaPerc / 100.0)));
         }
-        bool syncTo(GaugedValue *another) {
+        void syncTo(GaugedValue *another) {
             percentOffset = getCurrentAsPercentOfRange() - another->getCurrentAsPercentOfRange();
             percentOffset = max(min(percentOffset, 100.0), -100);
         }

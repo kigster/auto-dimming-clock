@@ -1,7 +1,7 @@
 eclipse.preferences.version=1
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.ARCHITECTURE/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.ARCHITECTURE/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.ARCHITECTURE/value=avr
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.ARCHITECTURE/value=AVR
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.ARCHIVE_FILE/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.ARCHIVE_FILE/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.ARCHIVE_FILE/value=arduino.ar
@@ -37,7 +37,7 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.CORE.PATH/value=${A.RUNTIME.PLATFORM.PATH}/cores/${A.BUILD.CORE}
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.CORE/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.CORE/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.CORE/value=arduino
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.CORE/value=${JANTJE.BUILD_CORE}
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.EXTRA_FLAGS/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.EXTRA_FLAGS/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.EXTRA_FLAGS/value=
@@ -67,7 +67,7 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.VARIANT.PATH/value=${A.RUNTIME.PLATFORM.PATH}/variants/${A.BUILD.VARIANT}
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.VARIANT/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.VARIANT/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.VARIANT/value=eightanaloginputs
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.BUILD.VARIANT/value=${JANTJE.BUILD_VARIANT}
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.CMD.PATH/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.CMD.PATH/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.CMD.PATH/value=${A.TOOLS.AVRDUDE.CMD.PATH}
@@ -133,7 +133,7 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.COMPI
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.COMPILER.OBJCOPY.EEP.FLAGS/value=-O ihex -j .eeprom --set-section-flags\=.eeprom\=alloc,load --no-change-warnings --change-section-lma .eeprom\=0
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.COMPILER.PATH/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.COMPILER.PATH/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.COMPILER.PATH/value=${A.RUNTIME.IDE.PATH}/hardware/tools/avr/bin/
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.COMPILER.PATH/value=${A.RUNTIME.TOOLS.AVR-GCC.PATH}
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.COMPILER.S.EXTRA_FLAGS/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.COMPILER.S.EXTRA_FLAGS/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.COMPILER.S.EXTRA_FLAGS/value=
@@ -166,10 +166,10 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.DTS/value=3600
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.LOCAL/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.LOCAL/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.LOCAL/value=1439343434
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.LOCAL/value=1439394982
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.UTC/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.UTC/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.UTC/value=1439368634
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.UTC/value=1439420182
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.ZONE/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.ZONE/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.EXTRA.TIME.ZONE/value=-28800
@@ -272,9 +272,12 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.RUNTI
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.RUNTIME.PLATFORM.PATH/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.RUNTIME.PLATFORM.PATH/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.RUNTIME.PLATFORM.PATH/value=/Applications/Arduino 1.6.4.app/Contents/Java/hardware/arduino/avr
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.RUNTIME.TOOLS.AVR-GCC.PATH/delimiter=\:
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.RUNTIME.TOOLS.AVR-GCC.PATH/operation=replace
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.RUNTIME.TOOLS.AVR-GCC.PATH/value=/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.RUNTIME.TOOLS.AVRDUDE.PATH/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.RUNTIME.TOOLS.AVRDUDE.PATH/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.RUNTIME.TOOLS.AVRDUDE.PATH/value=/Applications/Arduino 1.6.4.app/Contents/Java/hardware/tools/avr
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.RUNTIME.TOOLS.AVRDUDE.PATH/value=${A.RUNTIME.TOOLS.AVR-GCC.PATH}
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.SOFTWARE/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.SOFTWARE/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.SOFTWARE/value=ARDUINO
@@ -289,10 +292,10 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.BOOTLOADER.PATTERN/value="${A.CMD.PATH}" "-C${A.CONFIG.PATH}" ${A.BOOTLOADER.VERBOSE} -p${A.BUILD.MCU} -c${A.PROTOCOL} ${A.PROGRAM.EXTRA_PARAMS} "-Uflash\:w\:${A.RUNTIME.PLATFORM.PATH}/bootloaders/${A.BOOTLOADER.FILE}\:i" -Ulock\:w\:${A.BOOTLOADER.LOCK_BITS}\:m
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.CMD.PATH/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.CMD.PATH/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.CMD.PATH/value=${A.PATH}/bin/avrdude
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.CMD.PATH/value=${A.PATH}/../bin/avrdude
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.CONFIG.PATH/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.CONFIG.PATH/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.CONFIG.PATH/value=${A.PATH}/etc/avrdude.conf
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.CONFIG.PATH/value=${A.PATH}/../etc/avrdude.conf
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.ERASE.PARAMS.QUIET/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.ERASE.PARAMS.QUIET/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/A.TOOLS.AVRDUDE.ERASE.PARAMS.QUIET/value=-q -q
@@ -361,7 +364,7 @@ environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.BUILD_VARIANT/value=eightanaloginputs
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PORT/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PORT/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PORT/value=/dev/tty.usbserial-A702U4QB
+environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PORT/value=/dev/tty.usbserial-AH02MB22
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PROGMR/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PROGMR/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.1154288032/JANTJE.COM_PROGMR/value=Default

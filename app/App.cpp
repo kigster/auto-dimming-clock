@@ -65,8 +65,9 @@ namespace Wallock {
 
     void App::run() {
         rotary.tick();
-        processKnobEvents();
-        processPhotoresistorChange();
+        if (processKnobEvents() || processPhotoresistorChange()) {
+            Serial.println();
+        }
     }
 
     bool App::processKnobEvents() {
@@ -75,6 +76,7 @@ namespace Wallock {
             // normalize knob to increments of 1
             delta = delta / abs(delta);
             if (state.getDisplayBrightness().changeBy(delta)) {
+                lastKnobTouched = millis();
                 brightnessChangedEvent();
                 state.getPhotoresistorReading().syncTo(&state.getDisplayBrightness());
                 return true;
@@ -97,7 +99,7 @@ namespace Wallock {
             }
         #endif
 
-        if (currentPhotoValue != lastPhotoValue) {
+        if (millis() - lastKnobTouched > 2000 && currentPhotoValue != lastPhotoValue) {
             if (photo.setCurrent(currentPhotoValue) ) {
                 if (display.follow(&photo)) {
                     brightnessChangedEvent();

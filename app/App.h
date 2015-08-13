@@ -28,9 +28,6 @@
 #include "../neopixel/NeoPixelEffects.h"
 #endif
 
-#define MAX_BRIGHTNESS 15
-#define MIN_BRIGHTNESS 0
-
 namespace SetTime {
     typedef enum TimeChangeMode_e {
         Default = (1 << 0), Hour = (1 << 1), Minute = (1 << 2), Save = (1 << 4), Last = (1 << 5),
@@ -56,7 +53,7 @@ namespace Wallock {
             Adafruit_7segment                           &matrix;
             OneButton                                   &button;
 
-            uint32_t                                    lastDisplayedTime;
+            uint32_t                                    lastDisplayedTime, lastKnobTouched;
 
             bool                                        colonOn, screenOn, neoPixelsOn;
             int                                         lastPhotoValue, currentPhotoValue;
