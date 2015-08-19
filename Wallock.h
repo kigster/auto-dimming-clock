@@ -35,4 +35,4 @@
 
 
 extern char buffer[];
-
+extern int freeRam();
