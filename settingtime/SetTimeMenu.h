@@ -8,34 +8,31 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 
-#include "../BedTime.h"
+#include "../Wallock.h"
 #ifdef ENABLE_MENU
 
 #ifndef SETTIMEMENU_H_
 #define SETTIMEMENU_H_
+namespace Wallock {
+    class App;
 
-#include <Arduino.h>
-#include <DS1307RTC.h>
+    class SetTimeMenu {
+    public:
+        SetTimeMenu();
+        SetTimeMenu(Wallock::App *app);
+        void setApp(Wallock::App *app);
+        void configureTime() ;
+        void nextMode();
+    private:
 
-class BedTimeApp;
+        signed short h, m;
+        App *app;
+        char *what;
+        void instructions();
+        void updateTimeCallback();
+        void selectNumber(signed short *current, int min, int max);
 
-class SetTimeMenu {
-public:
-    SetTimeMenu();
-    SetTimeMenu(BedTimeApp *app);
-    void setApp(BedTimeApp *app);
-    void configureTime() ;
-    void nextMode();
-private:
-
-    signed short h, m;
-    BedTimeApp *app;
-    char *what;
-    void instructions();
-    void updateTimeCallback();
-    void selectNumber(signed short *current, int min, int max);
-
-};
-
+    };
+}
 #endif /* SETTIMEMENU_H_ */
 #endif /* ENABLE_MENU */
