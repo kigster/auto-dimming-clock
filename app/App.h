@@ -53,7 +53,7 @@ namespace Wallock {
             Adafruit_7segment                           &matrix;
             OneButton                                   &button;
 
-            uint32_t                                    lastDisplayedTime, lastKnobTouched;
+            uint32_t                                    lastDisplayedTime, lastTimeKnobTouched;
 
             bool                                        colonOn, screenOn, neoPixelsOn;
             int                                         lastPhotoValue, currentPhotoValue;

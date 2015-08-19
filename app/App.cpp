@@ -28,7 +28,7 @@ namespace Wallock {
         screenOn = colonOn = true;
         mode = SetTime::Default;
         photoOffsetPercentage = lastPhotoValue = currentPhotoValue = lastDisplayedTime = 0;
-
+        lastTimeKnobTouched = 0;
         neoPixelsOn = false;
         #ifdef ENABLE_LCD
             lcd = new LiquidCrystal_I2C(0x3F, 20, 4);
@@ -71,12 +71,12 @@ namespace Wallock {
     }
 
     bool App::processKnobEvents() {
-        signed long delta = rotary.delta();
-        if (delta != 0) {
+        signed short delta = rotary.delta();
+        if (abs(delta) > 2) {
             // normalize knob to increments of 1
-            delta = delta / abs(delta);
+            delta = (delta > 0) ? 1 : -1;
             if (state.getDisplayBrightness().changeBy(delta)) {
-                lastKnobTouched = millis();
+                lastTimeKnobTouched = millis();
                 brightnessChangedEvent();
                 state.getPhotoresistorReading().syncTo(&state.getDisplayBrightness());
                 return true;
@@ -99,7 +99,7 @@ namespace Wallock {
             }
         #endif
 
-        if (millis() - lastKnobTouched > 2000 && currentPhotoValue != lastPhotoValue) {
+        if (currentPhotoValue != lastPhotoValue) {
             if (photo.setCurrent(currentPhotoValue) ) {
                 if (display.follow(&photo)) {
                     brightnessChangedEvent();
