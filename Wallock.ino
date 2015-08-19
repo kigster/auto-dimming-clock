@@ -19,7 +19,7 @@
 #include "app/App.h"
 #include "app/State.h"
 
-char buffer[80];
+char buffer[100];
 
 Wallock::GaugedValue brightnessGauge("brightness", 0, 15, 1, true);
 Wallock::GaugedValue photoGauge("photo-value", 100, 500, 25, false);
@@ -83,6 +83,12 @@ void neoPixelNextEffect() {
     app.neoPixelNextEffect();
 }
 
+int freeRam () {
+  extern int __heap_start, *__brkval;
+  int v;
+  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+}
+
 bool detectRTC() {
     tmElements_t tm;
     bool rtcResult = RTC.read(tm);
@@ -91,7 +97,7 @@ bool detectRTC() {
             Serial.println(F("RTC.read() returned false, resetting to compile time"));
             app.helper.setDateToCompileTime();
         } else {
-            sprintf(buffer, "RTC.read() successful, booting at %d/%d/%d %d:%d", tm.Month, tm.Day, tm.Year, tm.Hour, tm.Second);
+            sprintf(buffer, "-> %d/%d/%d %d:%d", tm.Month, tm.Day, tm.Year, tm.Hour, tm.Second);
             Serial.println(buffer);
             return true;
         }
@@ -107,11 +113,8 @@ void setup() {
     setSyncProvider(getTeensy3Time);
 #endif
     Serial.println(F("[wallock] v2.1(c) 2015 kiguino.moos.io"));
-    Serial.println(F("app->setup()"));
 
     app.setup();
-
-    Serial.println(F("setting up timers.."));
 
     app.getButton()->attachClick(rotaryButtonClick);
     app.getButton()->attachLongPressStart(rotaryButtonLongPress);

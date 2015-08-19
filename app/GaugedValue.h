@@ -56,25 +56,24 @@ namespace Wallock {
 
             // if the difference exceeds increment reduce down to increment itself.
             // this allows to cap any "jumps" in values
-            signed int delta = newValue - lastValue;
+            signed int delta = newValue - current;
             if (abs(delta) < increment) {
                 // insufficient change, so no change at all
-                newValue = lastValue;
-            } else if (abs(delta) > increment && lockChangeToSingleIncrement) {
+                return false;
+            } else if (abs(delta) >= increment && lockChangeToSingleIncrement) {
                 newValue = current + (delta/abs(delta)) * increment;
             }
 
             if (newValue      >= (signed int) max)        newValue = max;
             else if (newValue <= (signed int) min)        newValue = min;
 
-            if ((unsigned int) newValue != lastValue) {
+            if ((unsigned int) newValue != current && millis() - lastChangedEpoch > 50) {
                 changed = true;
-
                 lastValue = current;
-                current = (unsigned int) newValue;
+                current = newValue;
                 lastChangedEpoch = millis();
                 sprintf(buffer, "%s: [%4d]-->[%4d] offset [%4d] ", name, lastValue, current, (short) floor(percentOffset));
-                Serial.print(buffer);
+                Serial.println(buffer);
             }
 
             return changed;
@@ -83,7 +82,7 @@ namespace Wallock {
             return ((float) 100.0 * current / (float) (max - min));
         }
         float getCurrentAsPercentOfRangeWithOffset() {
-            return max(min(((float) 100.0 * current / (float) (max - min) - percentOffset), 100), 0);
+            return max(min(((float) 100.0 * (current - min) / (float) (max - min) - percentOffset), 100), 0);
         }
         bool setCurrentAsPercentOfRange(float newValue) {
             return setCurrent( (signed int) ((newValue) / 100.0 * (float) (max - min)));

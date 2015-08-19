@@ -71,7 +71,7 @@ namespace Wallock {
     }
 
     bool App::processKnobEvents() {
-        signed short delta = rotary.delta();
+        static signed short delta = rotary.delta();
         if (abs(delta) > 2) {
             // normalize knob to increments of 1
             delta = (delta > 0) ? 1 : -1;
@@ -86,8 +86,8 @@ namespace Wallock {
     }
 
     bool App::processPhotoresistorChange() {
-        GaugedValue &photo = state.getPhotoresistorReading();
-        GaugedValue &display = state.getDisplayBrightness();
+        static GaugedValue &photo = state.getPhotoresistorReading();
+        static GaugedValue &display = state.getDisplayBrightness();
 
         currentPhotoValue = analogRead(pinout.pinPhotoResistor);
 
@@ -101,6 +101,7 @@ namespace Wallock {
 
         if (currentPhotoValue != lastPhotoValue) {
             if (photo.setCurrent(currentPhotoValue) ) {
+                lastPhotoValue = currentPhotoValue;
                 if (display.follow(&photo)) {
                     brightnessChangedEvent();
                     return true;
@@ -161,13 +162,13 @@ namespace Wallock {
         #else
             if (!RTC.read(tm)) {
                 if (RTC.chipPresent()) {
-                    debug(1, "Time chip detected, but not set. Resetting", true);
+                    Serial.println(F("Time chip detected, but not set. Resetting"));
                     #ifdef ENABLE_SET_TIME
                         helper.setDateToCompileTime();
                     #endif
                 } else {
                     matrix.printError();
-                    debug(1, "Time chip not detected", true);
+                    Serial.println(F("Time chip not detected"));
                     colonOn = !colonOn;
                 }
                 return;
@@ -179,11 +180,12 @@ namespace Wallock {
         m = tm.Minute;
         if (screenOn) displayTime(h, m);
         Serial.print(F("> "));
-        sprintf(buffer, "%2d:%02d:%02d %d/%02d/%d, Brightness [%d], Photo [%d]",
+        sprintf(buffer, "%2d:%02d:%02d %d/%02d/%d, BR: [%d] PH: [%d] FreeMem: [%d]",
                         h, m, tm.Second, tm.Month, tm.Day, 1970 + tm.Year,
                         state.getDisplayBrightness().getCurrent(),
-                        state.getPhotoresistorReading().getCurrent());
-        debug(2, buffer, true);
+                        state.getPhotoresistorReading().getCurrent(),
+                        freeRam());
+        debug(buffer);
     }
     /**
      * We receive negative hours or minutes when the other
