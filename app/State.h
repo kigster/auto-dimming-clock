@@ -35,4 +35,5 @@ namespace Wallock {
         }
     };
 };
+
 #endif /* WALLOCK_STATE_H_ */

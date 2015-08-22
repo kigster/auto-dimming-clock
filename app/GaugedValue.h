@@ -17,22 +17,22 @@ const static int PRINT_WAIT_MS = 100;
 namespace Wallock {
     class GaugedValue {
     private:
-        unsigned int current;
-        unsigned int lastValue;
-        unsigned int max;
-        unsigned int min;
-        unsigned int increment;
+        int current;
+        int lastValue;
+        int max;
+        int min;
+        int increment;
         bool lockChangeToSingleIncrement;
-        unsigned long lastChangedEpoch;
-        unsigned long lastPrintedEpoch;
+        long lastChangedEpoch;
+        long lastPrintedEpoch;
         bool changed;
         const char *name;
         float percentOffset;
     public:
         GaugedValue    (const char *_name,
-                        unsigned int _min,
-                        unsigned int _max,
-                        unsigned int _increment,
+                        int _min,
+                        int _max,
+                        int _increment,
                         bool _lockChangeToSingleIncrement) {
 
             name        = (char *)_name;
@@ -51,23 +51,23 @@ namespace Wallock {
             return current;
         }
 
-        bool setCurrent(signed int newValue) {
+        bool setCurrent(int newValue) {
             changed = false;
 
             // if the difference exceeds increment reduce down to increment itself.
             // this allows to cap any "jumps" in values
-            signed int delta = newValue - current;
+            signed long delta = (signed long) (newValue - current);
             if (abs(delta) < increment) {
                 // insufficient change, so no change at all
                 return false;
-            } else if (abs(delta) >= increment && lockChangeToSingleIncrement) {
+            } else if (abs(delta) > increment && lockChangeToSingleIncrement) {
                 newValue = current + (delta/abs(delta)) * increment;
             }
 
-            if (newValue      >= (signed int) max)        newValue = max;
-            else if (newValue <= (signed int) min)        newValue = min;
+            newValue = min(max, newValue);
+            newValue = max(min, newValue);
 
-            if ((unsigned int) newValue != current && millis() - lastChangedEpoch > 50) {
+            if (newValue != current) {
                 changed = true;
                 lastValue = current;
                 current = newValue;
@@ -90,8 +90,8 @@ namespace Wallock {
         float getLastChangeAsPercentOfRange() {
             return (100.0 * ((float) current - (float) lastValue) / (float) (max - min));
         }
-        bool changeBy(signed int delta) {
-            return setCurrent((signed int) current + delta);
+        bool changeBy(signed long delta) {
+            return setCurrent((int) ((signed int) current + (signed int) delta));
         }
         bool changeByPercent(float deltaPerc) {
             return changeBy((signed int) floor((float) (max - min) * (deltaPerc / 100.0)));

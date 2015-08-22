@@ -28,8 +28,9 @@ namespace Wallock {
         screenOn = colonOn = true;
         mode = SetTime::Default;
         photoOffsetPercentage = lastPhotoValue = currentPhotoValue = lastDisplayedTime = 0;
-        lastTimeKnobTouched = 0;
         neoPixelsOn = false;
+        clock24hr = true;
+        state.getDisplayBrightness().setCurrent(7);
         #ifdef ENABLE_LCD
             lcd = new LiquidCrystal_I2C(0x3F, 20, 4);
         #endif
@@ -45,7 +46,7 @@ namespace Wallock {
         matrix.begin(0x70);
         delay(100);
         matrix.clear();
-        brightnessChangedEvent();
+        changeBrightness();
         #ifdef ENABLE_PHOTORESISTOR
             pinMode(pinout.pinPhotoResistor, INPUT);
         #endif
@@ -63,6 +64,10 @@ namespace Wallock {
         #endif
     }
 
+    bool App::is24hr() {
+        return clock24hr;
+    }
+
     void App::run() {
         rotary.tick();
         if (processKnobEvents() || processPhotoresistorChange()) {
@@ -71,14 +76,12 @@ namespace Wallock {
     }
 
     bool App::processKnobEvents() {
-        static signed short delta = rotary.delta();
-        if (abs(delta) > 2) {
-            // normalize knob to increments of 1
+        long delta = rotary.delta();
+        if (abs(delta) >= 2) {
             delta = (delta > 0) ? 1 : -1;
             if (state.getDisplayBrightness().changeBy(delta)) {
-                lastTimeKnobTouched = millis();
-                brightnessChangedEvent();
-                state.getPhotoresistorReading().syncTo(&state.getDisplayBrightness());
+                changeBrightness();
+//                state.getPhotoresistorReading().syncTo(&state.getDisplayBrightness());
                 return true;
             }
         }
@@ -102,10 +105,10 @@ namespace Wallock {
         if (currentPhotoValue != lastPhotoValue) {
             if (photo.setCurrent(currentPhotoValue) ) {
                 lastPhotoValue = currentPhotoValue;
-                if (display.follow(&photo)) {
-                    brightnessChangedEvent();
-                    return true;
-                }
+//                if (display.follow(&photo)) {
+//                    changeBrightness();
+//                    return true;
+//                }
             }
         }
 
@@ -119,7 +122,7 @@ namespace Wallock {
         return false;
     }
 
-    void App::brightnessChangedEvent() {
+    void App::changeBrightness() {
         matrix.setBrightness(state.getDisplayBrightness().getCurrent());
     }
 
@@ -175,10 +178,7 @@ namespace Wallock {
             }
         #endif
 
-        h = tm.Hour % 12;
-        if (h == 0) { h = 12; }
-        m = tm.Minute;
-        if (screenOn) displayTime(h, m);
+        if (screenOn) displayTime(tm.Hour, tm.Minute);
         Serial.print(F("> "));
         sprintf(buffer, "%2d:%02d:%02d %d/%02d/%d, BR: [%d] PH: [%d] FreeMem: [%d]",
                         h, m, tm.Second, tm.Month, tm.Day, 1970 + tm.Year,
@@ -187,26 +187,46 @@ namespace Wallock {
                         freeRam());
         debug(buffer);
     }
+
+    int App::maxHour() {
+        return is24hr() ? 24 : 12;
+    }
     /**
      * We receive negative hours or minutes when the other
      * element is being setup / modified. A bit of nasty overloading, but hey. Whatever.
      */
-    void App::displayTime(signed short h, signed short m) {
+    void App::displayTime(short h, short m) {
         if (!screenOn && h >= 0 && m >= 0) return;
+
+        short hour = h; short minute = m;
+
+        // For dots and the colon:
+
+        // 0x02 - left colon - lower dot
+        // 0x04 - center colon
+        // 0x08 - left colon - upper dot
+        // 0x10 - decimal point
+        long now = millis();
         matrix.clear();
         colonOn = !colonOn;
-        if (h < 0 || m < 0) colonOn = false;
-        if (h > 0) {
-            if (h >= 10) {
-                matrix.writeDigitNum(0, h / 10, false);
-            }
-            matrix.writeDigitNum(1, h % 10, false);
+        uint8_t                      bitmask  = 0x00;
+        if (h < 0 || m < 0)          colonOn = false;
+        if (h >= 0) {
+            h = h % maxHour();
+            if (h == 0) { h = maxHour(); }
+
+            if (colonOn)               { bitmask |= 0x02; }
+            if (!is24hr() && h >= 12)  { bitmask |= 0x08; } // pm
+
+            if (h >= 10)    matrix.writeDigitNum(0, h / 10, false); // leftmost number
+                            matrix.writeDigitNum(1, h % 10, false);
         }
-        matrix.drawColon(colonOn);
         if (m >= 0) {
-            matrix.writeDigitNum(3, m / 10, false);
-            matrix.writeDigitNum(4, m % 10, false);
+                            matrix.writeDigitNum(3, m / 10, false);
+                            matrix.writeDigitNum(4, m % 10, false);
         }
+                            matrix.writeDigitRaw(2, bitmask); // dots
+
         matrix.writeDisplay();
     }
 
@@ -239,6 +259,8 @@ namespace Wallock {
         if (mode == SetTime::Default) {
             Serial.println(F("Mode is Default -> calling configureTime()"));
     #ifdef ENABLE_MENU
+//            timer.disable(0);
+//            timer.disable(1);
             menu.configureTime();
     #endif
         } else {

@@ -53,9 +53,9 @@ namespace Wallock {
             Adafruit_7segment                           &matrix;
             OneButton                                   &button;
 
-            uint32_t                                    lastDisplayedTime, lastTimeKnobTouched;
+            uint32_t                                    lastDisplayedTime;
 
-            bool                                        colonOn, screenOn, neoPixelsOn;
+            bool                                        colonOn, screenOn, neoPixelsOn, clock24hr;
             int                                         lastPhotoValue, currentPhotoValue;
             float                                       photoOffsetPercentage;
 
@@ -80,15 +80,16 @@ namespace Wallock {
                 NeoPixelManager *neoPixelManager;
             #endif
 
-
+            bool is24hr();
+            int  maxHour();
             void setup();
             void run();
 
             void refreshUI();
             void readEnvironment();
-            void brightnessChangedEvent();
+            void changeBrightness();
 
-            void displayTime(signed short h, signed short m);
+            void displayTime(short h, short m);
             void displayCurrentTime();
 
             void toggleDisplay();

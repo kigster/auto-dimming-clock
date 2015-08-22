@@ -22,7 +22,7 @@
 char buffer[100];
 
 Wallock::GaugedValue brightnessGauge("brightness", 0, 15, 1, true);
-Wallock::GaugedValue photoGauge("photo-value", 100, 500, 25, false);
+Wallock::GaugedValue photoGauge("photo-value", 0, 500, 25, false);
 
 Wallock::PinoutMapping pinout = {
         A3,     // PhotoResistor
@@ -32,12 +32,13 @@ Wallock::PinoutMapping pinout = {
          2      // Number of NeoPixels
 };
 
-Wallock::State state(photoGauge, brightnessGauge);
 RotaryEncoderWithButton rotary(
                 (uint8_t) pinout.pinRotaryLeft,
                 (uint8_t) pinout.pinRotaryRight,
                 (uint8_t) pinout.pinRotaryButton);
 Adafruit_7segment matrix;
+
+Wallock::State state(photoGauge, brightnessGauge);
 
 Wallock::App app(pinout, state, rotary, matrix);
 SimpleTimer timer;
@@ -156,8 +157,11 @@ void setup() {
 #endif
 }
 
+bool colonOn = false;
+uint8_t bitmask = 0;
+int i = 0;
+
 void loop() {
     timer.run();
     app.run();
-    delay(10);
 }

@@ -30,7 +30,7 @@ namespace Wallock {
     }
 
     void SetTimeMenu::nextMode() {
-        if (app->mode == SetTime::Last) app->mode = SetTime::Default;
+        if  (app->mode == SetTime::Last) app->mode = SetTime::Default;
         else app->mode = (SetTime::TimeMode) ((int) app->mode << 1);
         printf("Mode Changed, new mode: %d", (int) app->mode);
     }
@@ -47,9 +47,9 @@ namespace Wallock {
         breakTime(now(), tm);
     #else
         if (RTC.read(tm)) {
-            h = tm.Hour % 12;
+            h = tm.Hour % app->maxHour();
             if (h == 0) {
-                h = 12;
+                h = app->maxHour();
             }
             m = tm.Minute;
         } else {
@@ -64,7 +64,7 @@ namespace Wallock {
             instructions();
             what = (char *) "Hours";
             h = tm.Hour;
-            selectNumber(&h, 1, 12);
+            selectNumber(&h, 1, app->maxHour());
             if (app->mode == SetTime::Default) break;
             /* no break */
         case SetTime::Minute:
@@ -76,6 +76,7 @@ namespace Wallock {
         case SetTime::Save:
             tm.Hour = h;
             tm.Minute = m;
+            tm.Second = 0;
             sprintf(buffer, "New Time: %2d:%02d", h, m);
             Serial.print("Setting Time to: ");
             Serial.println(buffer);
@@ -101,8 +102,8 @@ namespace Wallock {
         Serial.println((int) startMode);
         app->displayTime((app->mode == SetTime::Hour ? h : -1), (app->mode == SetTime::Minute ? m : -1));
         while (app->mode == startMode) {
-            app->getButton()->tick();
-            signed short delta = app->getRotary()->delta();
+            app->getRotary()->tick();
+            int delta = app->getRotary()->delta();
             if (abs(delta) < 2) {
                 delay(20);
                 continue;
@@ -110,13 +111,13 @@ namespace Wallock {
             delta = (delta > 0) ? 1 : -1;
             int prev = *current;
             *current = *current + delta;
-            if (*current > max) *current = max;
-            if (*current < min) *current = min;
+            if (*current > max) *current = *current % max;
+            if (*current < min) *current = max;
             if (prev != *current) {
                 app->displayTime((app->mode == SetTime::Hour ? h : -1), (app->mode == SetTime::Minute ? m : -1));
                 sprintf(buffer, "%-7s: %2d:%02d", what, h, m);
                 app->debug(1, buffer, false);
-                delay(30);
+                delay(5);
             }
         }
         Serial.print(F("Exiting: selectNumber() "));
