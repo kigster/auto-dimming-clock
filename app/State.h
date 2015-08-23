@@ -14,24 +14,59 @@
 #include "GaugedValue.h"
 
 namespace Wallock {
+
+    typedef struct StateValues_s {
+        bool
+            displayOn = true,
+            colonOn = true;
+        bool
+            clock24hr = false,
+            neoPixelsOn = false;
+        int brightness;
+     } StateValues;
+
+
     class State {
     private:
-        GaugedValue &photoresistorReading,
-                    &displayBrightness;
-
-        bool    colonOn = false,
-                displayOn = false,
-                neoPixelsOn = false;
+        StateValues values;
     public:
-        State(GaugedValue &g1, GaugedValue &g2) :
-            photoresistorReading(g1),
-            displayBrightness(g2) {};
+        GaugedValue &photoReadout,
+                    &brightness;
 
-        GaugedValue &getPhotoresistorReading() {
-            return photoresistorReading;
+        State(GaugedValue &g1, GaugedValue &g2) :
+            photoReadout(g1),
+            brightness(g2) {};
+
+        GaugedValue &getPhotoReadout() {
+            return photoReadout;
         }
-        GaugedValue &getDisplayBrightness() {
-            return displayBrightness;
+        GaugedValue &getBrightness() {
+            return brightness;
+        }
+        StateValues getValues() {
+            return values;
+        }
+        void setBrightness(int newVal) {
+            brightness.setCurrent(newVal);
+            values.brightness = brightness.getCurrent();
+        }
+        int currentBrightness() {
+            return brightness.getCurrent();
+        }
+        int currentPhotoReadout() {
+            return photoReadout.getCurrent();
+        }
+        void flipColon() {
+            values.colonOn = !values.colonOn;
+        }
+        void flip24Hr() {
+            values.clock24hr = !values.clock24hr;
+        }
+        void flipDisplayOn() {
+            values.displayOn = !values.displayOn;
+        }
+        void synchronize() {
+
         }
     };
 };

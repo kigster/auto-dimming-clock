@@ -25,12 +25,8 @@ namespace Wallock {
                     button(_rotary.button)
     {
 
-        screenOn = colonOn = true;
         mode = SetTime::Default;
-        photoOffsetPercentage = lastPhotoValue = currentPhotoValue = lastDisplayedTime = 0;
-        neoPixelsOn = false;
-        clock24hr = true;
-        state.getDisplayBrightness().setCurrent(7);
+        lastDisplayedTime = 0;
         #ifdef ENABLE_LCD
             lcd = new LiquidCrystal_I2C(0x3F, 20, 4);
         #endif
@@ -46,9 +42,9 @@ namespace Wallock {
         matrix.begin(0x70);
         delay(100);
         matrix.clear();
-        changeBrightness();
         #ifdef ENABLE_PHOTORESISTOR
             pinMode(pinout.pinPhotoResistor, INPUT);
+            delay(100);
         #endif
 
         #ifdef ENABLE_LCD
@@ -62,83 +58,77 @@ namespace Wallock {
         #ifdef ENABLE_NEOPIXELS
             neoPixelManager->begin();
         #endif
-    }
 
-    bool App::is24hr() {
-        return clock24hr;
+
+        #ifdef ENABLE_PHOTORESISTOR
+            // set initial display brightness based on the photo
+            hasPhotoReadingChanged();
+            state.getBrightness().follow(&state.getPhotoReadout());
+            updateDisplayBrightness();
+        #endif
+
     }
 
     void App::run() {
         rotary.tick();
-        if (processKnobEvents() || processPhotoresistorChange()) {
-            Serial.println();
-        }
+
+        if (wasKnobRotated()) {
+            state.getPhotoReadout().syncOffsetTo(&state.getBrightness());
+
+        } else if (hasPhotoReadingChanged()) {
+            state.getBrightness().follow(&state.getPhotoReadout());
+
+        } else
+            return;
+
+        updateDisplayBrightness();
+        logStatus();
     }
 
-    bool App::processKnobEvents() {
+    bool App::wasKnobRotated() {
         long delta = rotary.delta();
         if (abs(delta) >= 2) {
             delta = (delta > 0) ? 1 : -1;
-            if (state.getDisplayBrightness().changeBy(delta)) {
-                changeBrightness();
-//                state.getPhotoresistorReading().syncTo(&state.getDisplayBrightness());
+            if (state.getBrightness().changeCurrentBy(delta)) {
                 return true;
             }
         }
         return false;
     }
 
-    bool App::processPhotoresistorChange() {
-        static GaugedValue &photo = state.getPhotoresistorReading();
-        static GaugedValue &display = state.getDisplayBrightness();
+    bool App::hasPhotoReadingChanged() {
+        #ifdef ENABLE_PHOTORESISTOR
+            return state.getPhotoReadout().
+                setCurrent(
+                      analogRead(
+                           pinout.pinPhotoResistor));
 
-        currentPhotoValue = analogRead(pinout.pinPhotoResistor);
+            #ifdef DEBUG
+                if (millis() - lastDisplayedTime > 1000) {
+                    Serial.print("photoresistor readout [0-1023]: ");
+                    Serial.println(state.currentPhotoReadout());
+                    lastDisplayedTime = millis();
+                }
+            #endif
 
-        #ifdef DEBUG
-            if (millis() - lastDisplayedTime > 1000) {
-                Serial.print("photoresistor readout [0-1023]: ");
-                Serial.println(currentPhotoValue);
-                lastDisplayedTime = millis();
-            }
+            #ifdef ENABLE_LCD
+                lcd->setCursor(0,2);
+                lcd->print("Photo Value: ");
+                sprintf(buffer, "%4d", state.currentPhotoReadout());
+                lcd->print(buffer);
+            #endif
+        #else
+            return false;
         #endif
 
-        if (currentPhotoValue != lastPhotoValue) {
-            if (photo.setCurrent(currentPhotoValue) ) {
-                lastPhotoValue = currentPhotoValue;
-//                if (display.follow(&photo)) {
-//                    changeBrightness();
-//                    return true;
-//                }
-            }
-        }
-
-        #ifdef ENABLE_LCD
-            lcd->setCursor(0,2);
-            lcd->print("Photo Value: ");
-            sprintf(buffer, "%4d", v);
-            lcd->print(buffer);
-        #endif
-
-        return false;
     }
 
-    void App::changeBrightness() {
-        matrix.setBrightness(state.getDisplayBrightness().getCurrent());
+    bool App::is24hr() {
+        return state.getValues().clock24hr;
     }
 
-
-
-    void App::neoPixelRefresh() {
-        #ifdef ENABLE_NEOPIXELS
-            if (neoPixelsOn)
-                neoPixelManager->refreshEffect();
-        #endif
-    }
-    void App::neoPixelNextEffect() {
-        #ifdef ENABLE_NEOPIXELS
-            if (neoPixelsOn)
-                neoPixelManager->nextEffect();
-        #endif
+    void App::updateDisplayBrightness() {
+        matrix.setBrightness(state.currentBrightness());
     }
 
     void App::debug(const char *message) {
@@ -157,8 +147,58 @@ namespace Wallock {
     }
 
     void App::displayCurrentTime() {
+        tmElements_t tm = getCurrentTime();
+        if (state.getValues().displayOn)
+            displayTime(tm.Hour, tm.Minute);
+    }
+    /**
+     * We receive negative hours or minutes when the other
+     * element is being setup / modified. A bit of nasty overloading, but hey. Whatever.
+     *
+     * hours should always be passed in in a 24 hour format, ie. 0 <= h <= 23
+     */
+    void App::displayTime(short h, short m) {
+        if (!state.getValues().displayOn)
+            return;
+
+        if (h < 0 && m < 0) return;
+
+        // For dots and the colon:
+
+        // 0x02 - left colon - lower dot
+        // 0x04 - center colon
+        // 0x08 - left colon - upper dot
+        // 0x10 - decimal point
+
+        matrix.clear();
+        state.flipColon();
+        bool colonOn = state.getValues().colonOn;
+
+        uint8_t                bitmask  = 0x00;
+        if (h < 0 || m < 0)    colonOn = false;
+        if (colonOn)           { bitmask |= 0x02; }
+
+        // hours
+        if (h >= 0) {
+            if (!is24hr() && h >= 12)       { bitmask |= 0x08; } // pm
+            h = h % maxHour();
+            if (h >= 10)    matrix.writeDigitNum(0, h / 10, false); // leftmost number
+                            matrix.writeDigitNum(1, h % 10, false);
+        }
+        // minutes
+        if (m >= 0) {
+            m = m % 60;
+                            matrix.writeDigitNum(3, m / 10, false);
+                            matrix.writeDigitNum(4, m % 10, false);
+        }
+                            matrix.writeDigitRaw(2, bitmask); // dots
+
+        matrix.writeDisplay();
+    }
+
+
+    tmElements_t App::getCurrentTime() {
         tmElements_t tm;
-        short h, m;
 
         #ifdef TEENSYDUINO
             breakTime(now(), tm);
@@ -168,67 +208,34 @@ namespace Wallock {
                     Serial.println(F("Time chip detected, but not set. Resetting"));
                     #ifdef ENABLE_SET_TIME
                         helper.setDateToCompileTime();
-                    #endif
+        #endif
                 } else {
                     matrix.printError();
                     Serial.println(F("Time chip not detected"));
-                    colonOn = !colonOn;
+                    state.flipColon();
                 }
-                return;
             }
         #endif
-
-        if (screenOn) displayTime(tm.Hour, tm.Minute);
-        Serial.print(F("> "));
-        sprintf(buffer, "%2d:%02d:%02d %d/%02d/%d, BR: [%d] PH: [%d] FreeMem: [%d]",
-                        h, m, tm.Second, tm.Month, tm.Day, 1970 + tm.Year,
-                        state.getDisplayBrightness().getCurrent(),
-                        state.getPhotoresistorReading().getCurrent(),
-                        freeRam());
-        debug(buffer);
+        return tm;
     }
 
     int App::maxHour() {
         return is24hr() ? 24 : 12;
     }
-    /**
-     * We receive negative hours or minutes when the other
-     * element is being setup / modified. A bit of nasty overloading, but hey. Whatever.
-     */
-    void App::displayTime(short h, short m) {
-        if (!screenOn && h >= 0 && m >= 0) return;
 
-        short hour = h; short minute = m;
+    void App::logStatus() {
+        tmElements_t tm = getCurrentTime();
 
-        // For dots and the colon:
-
-        // 0x02 - left colon - lower dot
-        // 0x04 - center colon
-        // 0x08 - left colon - upper dot
-        // 0x10 - decimal point
-        long now = millis();
-        matrix.clear();
-        colonOn = !colonOn;
-        uint8_t                      bitmask  = 0x00;
-        if (h < 0 || m < 0)          colonOn = false;
-        if (h >= 0) {
-            h = h % maxHour();
-            if (h == 0) { h = maxHour(); }
-
-            if (colonOn)               { bitmask |= 0x02; }
-            if (!is24hr() && h >= 12)  { bitmask |= 0x08; } // pm
-
-            if (h >= 10)    matrix.writeDigitNum(0, h / 10, false); // leftmost number
-                            matrix.writeDigitNum(1, h % 10, false);
-        }
-        if (m >= 0) {
-                            matrix.writeDigitNum(3, m / 10, false);
-                            matrix.writeDigitNum(4, m % 10, false);
-        }
-                            matrix.writeDigitRaw(2, bitmask); // dots
-
-        matrix.writeDisplay();
+        sprintf(buffer, "<%2d:%02d:%02d> <%4d free> <%s> <bright %2d, photo [%3d|%4d]> ",
+                        tm.Hour, tm.Minute, tm.Second,
+                        freeRam(),
+                        state.currentBrightness(),
+                        state.currentPhotoReadout(),
+                        state.getPhotoReadout().offset
+        );
+        Serial.println(buffer);
     }
+
 
     void App::cb_ButtonClick() {
         Serial.print(F("Entering BedTimeApp::cb_ButtonClick, mode = "));
@@ -238,6 +245,8 @@ namespace Wallock {
                 menu.nextMode();
             #endif
         } else {
+            state.flip24Hr();
+            displayCurrentTime();
             #ifdef ENABLE_NEOPIXELS
                 toggleNeoPixels();
             #endif
@@ -267,6 +276,28 @@ namespace Wallock {
             Serial.println(F("Mode is not Default, Hold is ignored."));
         }
     }
+    void App::toggleDisplay() {
+        state.flipDisplayOn();
+        matrix.clear();
+        matrix.writeDisplay();
+        if (state.getValues().displayOn) {
+            displayCurrentTime();
+        }
+    }
+
+
+    void App::neoPixelRefresh() {
+        #ifdef ENABLE_NEOPIXELS
+            if (neoPixelsOn)
+                neoPixelManager->refreshEffect();
+        #endif
+    }
+    void App::neoPixelNextEffect() {
+        #ifdef ENABLE_NEOPIXELS
+            if (neoPixelsOn)
+                neoPixelManager->nextEffect();
+        #endif
+    }
 
     void App::toggleNeoPixels() {
          #ifdef ENABLE_NEOPIXELS
@@ -278,15 +309,6 @@ namespace Wallock {
             }
         #endif
     }
-    void App::toggleDisplay() {
-        screenOn = !screenOn;
-        matrix.clear();
-        matrix.writeDisplay();
-        if (screenOn) {
-            displayCurrentTime();
-        }
-    }
-
 
     OneButton* App::getButton() {
         return &button;
@@ -294,6 +316,5 @@ namespace Wallock {
     RotaryEncoderWithButton *App::getRotary() {
         return &rotary;
     }
-
 
 }

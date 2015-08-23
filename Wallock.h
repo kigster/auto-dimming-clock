@@ -12,7 +12,7 @@
     #define _WALLOCK_H_
 
     // Hardware Config
-//    #define ENABLE_PHOTORESISTOR
+    #define ENABLE_PHOTORESISTOR
     #define ENABLE_SET_TIME
     #define ENABLE_MENU
     //#define ENABLE_LCD
@@ -20,6 +20,8 @@
 
     //#define DEBUG 1
 
+    #define BRIGHTNESS_MAX 15
+    #define BRIGHTNESS_MIN  0
     #include <RotaryEncoderWithButton.h>
     #include <Wire.h>
     #include <Time.h>
@@ -30,8 +32,9 @@
     #include <SimpleTimer.h>
 
     extern char buffer[];
-    extern int freeRam();
+    extern uint32_t freeRam();
     extern SimpleTimer timer;
+    class Serial;
 #endif // _WALLOC_H_
 
 #include "Arduino.h"

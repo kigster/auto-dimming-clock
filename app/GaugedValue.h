@@ -12,6 +12,10 @@
 #define GAUGEDVALUE_H_
 #include "../Wallock.h"
 
+
+#define INRANGE(X, MIN, MAX) (min(max(X, MIN), MAX))
+
+
 const static int PRINT_WAIT_MS = 100;
 
 namespace Wallock {
@@ -27,81 +31,104 @@ namespace Wallock {
         long lastPrintedEpoch;
         bool changed;
         const char *name;
-        float percentOffset;
+
     public:
+        int offset;
+
         GaugedValue    (const char *_name,
                         int _min,
                         int _max,
-                        int _increment,
+                        int _minimumIncrement,
                         bool _lockChangeToSingleIncrement) {
 
             name        = (char *)_name;
             min         = _min;
             max         = _max;
-            increment   = _increment;
+            increment   = _minimumIncrement;
             lockChangeToSingleIncrement = _lockChangeToSingleIncrement;
 
             changed     = false;
             current     = (max - min) / 2;
             lastChangedEpoch = lastPrintedEpoch = current = lastValue = 0;
-            percentOffset = 0.0;
+            offset      = 0;
 
         }
+        void ensureRange(int *value) {
+            *value = INRANGE(*value, min, max);
+        }
+
+        // returns a possibly adjusted by offset value
         signed int getCurrent() {
-            return current;
+            return INRANGE(current + offset, min, max);
         }
 
-        bool setCurrent(int newValue) {
-            changed = false;
+        float getCurrentAsPercentOfRange() {
+            float perc = 100.0 * (getCurrent() - min) / (float) (max - min);
+            perc = INRANGE(perc, 0, 100);
+            return perc;
+        }
 
-            // if the difference exceeds increment reduce down to increment itself.
-            // this allows to cap any "jumps" in values
-            signed long delta = (signed long) (newValue - current);
-            if (abs(delta) < increment) {
-                // insufficient change, so no change at all
-                return false;
-            } else if (abs(delta) > increment && lockChangeToSingleIncrement) {
-                newValue = current + (delta/abs(delta)) * increment;
-            }
+        bool setCurrentFromPercentage(float perc) {
+            perc = INRANGE(perc, 0, 100);
+            int newValue = (perc / 100.0) * (float) (max - min) + min;
+            return setCurrent(newValue);
+        }
 
-            newValue = min(max, newValue);
-            newValue = max(min, newValue);
+        bool initCurrentFromPercentage(float percentCurrent) {
+            int newValue = floor((percentCurrent / 100.0) * (float)(max - min)) + min;
+            current = newValue;
+        }
 
-            if (newValue != current) {
-                changed = true;
-                lastValue = current;
-                current = newValue;
-                lastChangedEpoch = millis();
-                sprintf(buffer, "%s: [%4d]-->[%4d] offset [%4d] ", name, lastValue, current, (short) floor(percentOffset));
-                Serial.println(buffer);
+        bool changeCurrentBy(int delta) {
+            bool changed = false;
+            int newValue;
+
+            if (abs(delta) >= increment) {
+                if (lockChangeToSingleIncrement) {
+                    delta = delta > 0 ? increment : -increment;
+                }
+
+                newValue = current + delta;
+                ensureRange(&newValue);
+
+                if (newValue != current) {
+                    lastValue = current;
+                    current = (int) newValue;
+                    lastChangedEpoch = millis();
+                    changed = true;
+                    toSerial();
+                }
             }
 
             return changed;
         }
-        float getCurrentAsPercentOfRange() {
-            return ((float) 100.0 * current / (float) (max - min));
+
+        bool setCurrent(int newValue) {
+            ensureRange(&newValue);
+            int delta = newValue - current;
+            return changeCurrentBy(delta);
         }
-        float getCurrentAsPercentOfRangeWithOffset() {
-            return max(min(((float) 100.0 * (current - min) / (float) (max - min) - percentOffset), 100), 0);
+
+        void syncOffsetTo(GaugedValue *another) {
+            float percentOffset = another->getCurrentAsPercentOfRange() -
+                                     this->getCurrentAsPercentOfRange();
+            percentOffset = INRANGE(percentOffset, -100.0, 100.0);
+            offset = percentOffset / 100.0 * (signed int)(max - min);
         }
-        bool setCurrentAsPercentOfRange(float newValue) {
-            return setCurrent( (signed int) ((newValue) / 100.0 * (float) (max - min)));
+
+        void follow(GaugedValue *another) {
+            float percAnother = another->getCurrentAsPercentOfRange();
+            setCurrentFromPercentage(percAnother);
         }
-        float getLastChangeAsPercentOfRange() {
-            return (100.0 * ((float) current - (float) lastValue) / (float) (max - min));
-        }
-        bool changeBy(signed long delta) {
-            return setCurrent((int) ((signed int) current + (signed int) delta));
-        }
-        bool changeByPercent(float deltaPerc) {
-            return changeBy((signed int) floor((float) (max - min) * (deltaPerc / 100.0)));
-        }
-        void syncTo(GaugedValue *another) {
-            percentOffset = getCurrentAsPercentOfRange() - another->getCurrentAsPercentOfRange();
-            percentOffset = max(min(percentOffset, 100.0), -100);
-        }
-        bool follow(GaugedValue *another) {
-            return setCurrentAsPercentOfRange(another->getCurrentAsPercentOfRangeWithOffset());
+
+        void toSerial() {
+            sprintf(buffer, " <%s: (%3d)->(%3d|%3d) %3d%%> ",
+                            name,
+                            lastValue,
+                            current,
+                            offset,
+                            (int) floor(getCurrentAsPercentOfRange()));
+            Serial.print(buffer);
         }
     };
 };

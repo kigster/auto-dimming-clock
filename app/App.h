@@ -14,6 +14,8 @@
 #include "../Wallock.h"
 #include "State.h"
 
+
+
 #ifdef ENABLE_LCD
 #include <LiquidCrystal_I2C.h>
 #endif
@@ -54,11 +56,8 @@ namespace Wallock {
             OneButton                                   &button;
 
             uint32_t                                    lastDisplayedTime;
-
-            bool                                        colonOn, screenOn, neoPixelsOn, clock24hr;
-            int                                         lastPhotoValue, currentPhotoValue;
-            float                                       photoOffsetPercentage;
-
+            unsigned short                              displayBrightness;
+            void logStatus();
         public:
             App(            PinoutMapping               &_pinout,
                             State                       &_state,
@@ -80,17 +79,17 @@ namespace Wallock {
                 NeoPixelManager *neoPixelManager;
             #endif
 
-            bool is24hr();
-            int  maxHour();
             void setup();
             void run();
 
-            void refreshUI();
-            void readEnvironment();
-            void changeBrightness();
+            bool is24hr();
+            int  maxHour();
 
-            void displayTime(short h, short m);
             void displayCurrentTime();
+            tmElements_t getCurrentTime();
+            void displayTime(short h, short m);
+
+            void updateDisplayBrightness();
 
             void toggleDisplay();
             void toggleNeoPixels();
@@ -104,12 +103,11 @@ namespace Wallock {
             void debug(int row, const char *message, bool clear);
             void debug(const char *message);
 
-            bool processPhotoresistorChange();
-            bool processKnobEvents();
+            bool hasPhotoReadingChanged();
+            bool wasKnobRotated();
 
             OneButton* getButton();
             RotaryEncoderWithButton *getRotary();
-
     };
 }
 #endif /* BEDTIMEAPP_H_ */

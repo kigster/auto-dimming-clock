@@ -48,7 +48,7 @@ namespace Wallock {
     #else
         if (RTC.read(tm)) {
             h = tm.Hour % app->maxHour();
-            if (h == 0) {
+            if (h == 0 || h == app->maxHour()) {
                 h = app->maxHour();
             }
             m = tm.Minute;
@@ -59,40 +59,45 @@ namespace Wallock {
         }
     #endif
         switch (app->mode) {
-        case SetTime::Hour:
-            app->debug(0, "====== Setup =======", true);
-            instructions();
-            what = (char *) "Hours";
-            h = tm.Hour;
-            selectNumber(&h, 1, app->maxHour());
-            if (app->mode == SetTime::Default) break;
-            /* no break */
-        case SetTime::Minute:
-            what = (char *) "Minutes";
-            m = tm.Minute;
-            selectNumber(&m, 0, 59);
-            if (app->mode == SetTime::Default) break;
-            /* no break */
-        case SetTime::Save:
-            tm.Hour = h;
-            tm.Minute = m;
-            tm.Second = 0;
-            sprintf(buffer, "New Time: %2d:%02d", h, m);
-            Serial.print("Setting Time to: ");
-            Serial.println(buffer);
-            app->debug(0, "Saving New Time...", true);
-            app->debug(1, buffer, false);
-            app->debug(3, "Success! :)", false);
-            app->helper.setTimeTo(tm);
-            nextMode();
-            delay(1000);
-            /* no break */
-        case SetTime::Last:
-            app->mode = SetTime::Default;
-            /* no break */
-        case SetTime::Default:
-            return;
-            break;
+            case SetTime::Hour:
+
+                app->debug(0, "====== Setup =======", true);
+                instructions();
+                what = (char *) "Hours";
+                h = tm.Hour;
+                selectNumber(&h, 1, app->maxHour());
+                if (app->mode == SetTime::Default) break;
+                /* no break */
+
+            case SetTime::Minute:
+                what = (char *) "Minutes";
+                m = tm.Minute;
+                selectNumber(&m, 0, 59);
+                if (app->mode == SetTime::Default) break;
+                /* no break */
+
+            case SetTime::Save:
+                tm.Hour = h;
+                tm.Minute = m;
+                tm.Second = 0;
+                sprintf(buffer, "New Time: %2d:%02d", h, m);
+                Serial.print("Setting Time to: ");
+                Serial.println(buffer);
+                app->debug(0, "Saving New Time...", true);
+                app->debug(1, buffer, false);
+                app->debug(3, "Success! :)", false);
+                app->helper.setTimeTo(tm);
+                nextMode();
+                delay(1000);
+                /* no break */
+
+            case SetTime::Last:
+                app->mode = SetTime::Default;
+                /* no break */
+
+            case SetTime::Default:
+                return;
+                break;
         };
     }
 
@@ -108,13 +113,16 @@ namespace Wallock {
                 delay(20);
                 continue;
             }
+
             delta = (delta > 0) ? 1 : -1;
+
             int prev = *current;
             *current = *current + delta;
             if (*current > max) *current = *current % max;
             if (*current < min) *current = max;
             if (prev != *current) {
-                app->displayTime((app->mode == SetTime::Hour ? h : -1), (app->mode == SetTime::Minute ? m : -1));
+                app->displayTime((app->mode == SetTime::Hour ? h : -1),
+                                 (app->mode == SetTime::Minute ? m : -1));
                 sprintf(buffer, "%-7s: %2d:%02d", what, h, m);
                 app->debug(1, buffer, false);
                 delay(5);

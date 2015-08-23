@@ -21,8 +21,8 @@
 
 char buffer[100];
 
-Wallock::GaugedValue brightnessGauge("brightness", 0, 15, 1, true);
-Wallock::GaugedValue photoGauge("photo-value", 0, 500, 25, false);
+Wallock::GaugedValue gvBrightness  ("brightness", BRIGHTNESS_MIN, BRIGHTNESS_MAX, 1, true);
+Wallock::GaugedValue gvPhotoReadout("photoValue", 0, 500, 40, false);
 
 Wallock::PinoutMapping pinout = {
         A3,     // PhotoResistor
@@ -38,7 +38,7 @@ RotaryEncoderWithButton rotary(
                 (uint8_t) pinout.pinRotaryButton);
 Adafruit_7segment matrix;
 
-Wallock::State state(photoGauge, brightnessGauge);
+Wallock::State state(gvPhotoReadout, gvBrightness);
 
 Wallock::App app(pinout, state, rotary, matrix);
 SimpleTimer timer;
@@ -72,11 +72,6 @@ void rotaryButtonLongPress() {
 void displayTimeNow() {
     app.displayCurrentTime();
 }
-void readPhotoResistor() {
-#ifdef ENABLE_PHOTORESISTOR
-    app.processPhotoresistorChange();
-#endif
-}
 void neoPixelRefresh() {
     app.neoPixelRefresh();
 }
@@ -84,11 +79,29 @@ void neoPixelNextEffect() {
     app.neoPixelNextEffect();
 }
 
-int freeRam () {
-  extern int __heap_start, *__brkval;
-  int v;
-  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+#ifdef TEENSYDUINO
+uint32_t freeRam(){ // for Teensy 3.0
+    uint32_t stackTop;
+    uint32_t heapTop;
+
+    // current position of the stack.
+    stackTop = (uint32_t) &stackTop;
+
+    // current position of heap.
+    void* hTop = malloc(1);
+    heapTop = (uint32_t) hTop;
+    free(hTop);
+
+    // The difference is the free, available ram.
+    return stackTop - heapTop;
 }
+#else
+uint32_t freeRam () {
+    extern int __heap_start, *__brkval;
+    int v;
+    return (uint32_t) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+}
+#endif
 
 bool detectRTC() {
     tmElements_t tm;
@@ -122,26 +135,25 @@ void setup() {
     app.getButton()->attachDoubleClick(rotaryButtonDoubleClick);
 
     timer.setInterval( 1000, (timer_callback) displayTimeNow);
-    timer.setInterval( 2000, (timer_callback) readPhotoResistor);
     timer.setInterval( 5000, (timer_callback) neoPixelNextEffect);
     timer.setInterval(    5, (timer_callback) neoPixelRefresh);
 
 
 #ifdef ENABLE_SET_TIME
-#ifdef TEENSYDUINO
-    if (year() < 2014) {
-        Serial.println("[BLOOPERS!]");
-        Serial.prhint("Year returned is < 2014, resetting time to compile time, 12:00. Year: "); Serial.println(year());
-        app.helper.setDateToCompileTime();
-    } else {
-        Serial.println("[OK]");
-    }
-#else
-    while(!detectRTC()) {
-        Serial.print(F("RTC chip not detected, can not proceed."));
-        delay(1000);
-    }
-#endif /* TEENSYDUINO */
+    #ifdef TEENSYDUINO
+        if (year() < 2014) {
+            Serial.println("[BLOOPERS!]");
+            Serial.print("Year returned is < 2014, resetting time to compile time, 12:00. Year: "); Serial.println(year());
+            app.helper.setDateToCompileTime();
+        } else {
+            Serial.println("[OK]");
+        }
+    #else
+        while(!detectRTC()) {
+            Serial.print(F("RTC chip not detected, can not proceed."));
+            delay(1000);
+        }
+    #endif /* TEENSYDUINO */
 #endif /* ENABLE_SET_TIME */
 
 #ifdef ENABLE_NEOPIXELS
@@ -156,10 +168,6 @@ void setup() {
     Serial.println("Setup complete, entering loop...");
 #endif
 }
-
-bool colonOn = false;
-uint8_t bitmask = 0;
-int i = 0;
 
 void loop() {
     timer.run();
