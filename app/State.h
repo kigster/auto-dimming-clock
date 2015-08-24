@@ -56,14 +56,14 @@ namespace Wallock {
         int currentPhotoReadout() {
             return photoReadout.getCurrent();
         }
-        void flipColon() {
-            values.colonOn = !values.colonOn;
+        bool flipColon() {
+            return values.colonOn = !values.colonOn;
         }
-        void flip24Hr() {
-            values.clock24hr = !values.clock24hr;
+        bool flip24Hr() {
+            return values.clock24hr = !values.clock24hr;
         }
-        void flipDisplayOn() {
-            values.displayOn = !values.displayOn;
+        bool flipDisplayOn() {
+            return values.displayOn = !values.displayOn;
         }
         void synchronize() {
 

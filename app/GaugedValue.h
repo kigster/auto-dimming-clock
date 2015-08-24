@@ -63,20 +63,19 @@ namespace Wallock {
         }
 
         float getCurrentAsPercentOfRange() {
-            float perc = 100.0 * (getCurrent() - min) / (float) (max - min);
+            float perc = ((float) getCurrent() - min) / ((float)max - min) * 100.0;
             perc = INRANGE(perc, 0, 100);
             return perc;
         }
 
         bool setCurrentFromPercentage(float perc) {
             perc = INRANGE(perc, 0, 100);
-            int newValue = (perc / 100.0) * (float) (max - min) + min;
-            return setCurrent(newValue);
-        }
-
-        bool initCurrentFromPercentage(float percentCurrent) {
-            int newValue = floor((percentCurrent / 100.0) * (float)(max - min)) + min;
-            current = newValue;
+            int newValue = (int)((perc / 100.0) * ((float) max - min) + min);
+            if (current != newValue) {
+                current = newValue;
+                return true;
+            }
+            return false;
         }
 
         bool changeCurrentBy(int delta) {
@@ -112,7 +111,7 @@ namespace Wallock {
         void syncOffsetTo(GaugedValue *another) {
             float percentOffset = another->getCurrentAsPercentOfRange() -
                                      this->getCurrentAsPercentOfRange();
-            percentOffset = INRANGE(percentOffset, -100.0, 100.0);
+            percentOffset = INRANGE(percentOffset, -50.0, 50.0); // max shift is half the range
             offset = percentOffset / 100.0 * (signed int)(max - min);
         }
 
@@ -122,14 +121,17 @@ namespace Wallock {
         }
 
         void toSerial() {
-            sprintf(buffer, " <%s: (%3d)->(%3d|%3d) %3d%%> ",
-                            name,
-                            lastValue,
-                            current,
-                            offset,
-                            (int) floor(getCurrentAsPercentOfRange()));
-            Serial.print(buffer);
+            #if DEBUG
+                sprintf(buffer, " <%s: (%3d)->(%3d|%3d) %3d%%> ",
+                                name,
+                                lastValue,
+                                current,
+                                offset,
+                                (int) floor(getCurrentAsPercentOfRange()));
+                Serial.print(buffer);
+            #endif
         }
+
     };
 };
 #endif /* GAUGEDVALUE_H_ */

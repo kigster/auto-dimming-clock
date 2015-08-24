@@ -9,33 +9,33 @@
  */
 
 #ifndef _WALLOCK_H_
-    #define _WALLOCK_H_
+#define _WALLOCK_H_
 
-    // Hardware Config
-    #define ENABLE_PHOTORESISTOR
-    #define ENABLE_SET_TIME
-    #define ENABLE_MENU
-    //#define ENABLE_LCD
-    //#define ENABLE_NEOPIXELS
+#define ENABLE_PHOTORESISTOR   true
+#define ENABLE_SET_TIME        true
+#define ENABLE_MENU            true
+#define ENABLE_LCD             false
+#define ENABLE_NEOPIXELS       false
 
-    //#define DEBUG 1
+#define DEBUG                  false
 
-    #define BRIGHTNESS_MAX 15
-    #define BRIGHTNESS_MIN  0
-    #include <RotaryEncoderWithButton.h>
-    #include <Wire.h>
-    #include <Time.h>
-    #include <DS1307RTC.h>
-    #include <Adafruit_LEDBackpack.h>
-    #include <Adafruit_GFX.h>
-    #include <OneButton.h>
-    #include <SimpleTimer.h>
-
-    extern char buffer[];
-    extern uint32_t freeRam();
-    extern SimpleTimer timer;
-    class Serial;
-#endif // _WALLOC_H_
+#define BRIGHTNESS_MAX          15
+#define BRIGHTNESS_MIN           0
 
 #include "Arduino.h"
+
+#include <RotaryEncoderWithButton.h>
+#include <Wire.h>
+#include <Time.h>
+#include <DS1307RTC.h>
+#include <Adafruit_LEDBackpack.h>
+#include <Adafruit_GFX.h>
+#include <OneButton.h>
+#include <SimpleTimer.h>
+
+extern char buffer[];
+extern uint32_t freeRam();
+extern SimpleTimer timer;
+#endif // _WALLOC_H_
+
 

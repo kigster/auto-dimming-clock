@@ -16,16 +16,16 @@
 
 
 
-#ifdef ENABLE_LCD
+#if ENABLE_LCD
 #include <LiquidCrystal_I2C.h>
 #endif
 
-#ifdef ENABLE_SET_TIME
+#if ENABLE_SET_TIME
 #include "../settingtime/SetTimeHelper.h"
 #include "../settingtime/SetTimeMenu.h"
 #endif
 
-#ifdef ENABLE_NEOPIXELS
+#if ENABLE_NEOPIXELS
 #include "../neopixel/NeoPixelManager.h"
 #include "../neopixel/NeoPixelEffects.h"
 #endif
@@ -35,6 +35,7 @@ namespace SetTime {
         Default = (1 << 0), Hour = (1 << 1), Minute = (1 << 2), Save = (1 << 4), Last = (1 << 5),
     } TimeMode;
 };
+
 
 namespace Wallock {
 
@@ -47,7 +48,7 @@ namespace Wallock {
      } PinoutMapping;
 
 
-    class App {
+     class App {
         private:
             PinoutMapping                               &pinout;
             State                                       &state;
@@ -56,8 +57,11 @@ namespace Wallock {
             OneButton                                   &button;
 
             uint32_t                                    lastDisplayedTime;
-            unsigned short                              displayBrightness;
             void logStatus();
+
+            bool hasPhotoReadingChanged();
+            bool wasKnobRotated();
+
         public:
             App(            PinoutMapping               &_pinout,
                             State                       &_state,
@@ -66,16 +70,16 @@ namespace Wallock {
 
             SetTime::TimeMode mode;
 
-            #ifdef ENABLE_LCD
+            #if ENABLE_LCD
                 LiquidCrystal_I2C *lcd;  // set the LCD address to 0x27 for a 16 chars and 2 line display
             #endif
-            #ifdef ENABLE_MENU
+            #if ENABLE_MENU
                 SetTimeMenu menu;
             #endif
-            #ifdef ENABLE_SET_TIME
+            #if ENABLE_SET_TIME
                 SetTimeHelper helper;
             #endif
-            #ifdef ENABLE_NEOPIXELS
+            #if ENABLE_NEOPIXELS
                 NeoPixelManager *neoPixelManager;
             #endif
 
@@ -84,7 +88,7 @@ namespace Wallock {
 
             bool is24hr();
             int  maxHour();
-
+            bool flip24hr();
             void displayCurrentTime();
             tmElements_t getCurrentTime();
             void displayTime(short h, short m);
@@ -96,18 +100,17 @@ namespace Wallock {
             void neoPixelRefresh();
             void neoPixelNextEffect();
 
-            void cb_ButtonClick();
-            void cb_ButtonDoubleClick();
-            void cb_ButtonHold();
+            void eventClick();
+            void eventDblClick();
+            void eventHold();
 
             void debug(int row, const char *message, bool clear);
             void debug(const char *message);
 
-            bool hasPhotoReadingChanged();
-            bool wasKnobRotated();
 
             OneButton* getButton();
             RotaryEncoderWithButton *getRotary();
-    };
+     };
 }
+
 #endif /* BEDTIMEAPP_H_ */

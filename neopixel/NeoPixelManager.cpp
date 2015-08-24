@@ -9,7 +9,7 @@
  */
 
 #include "../Wallock.h"
-#ifdef ENABLE_NEOPIXELS
+#if ENABLE_NEOPIXELS
 
 #include "NeoPixelManager.h"
 #include "NeoPixelEffects.h"

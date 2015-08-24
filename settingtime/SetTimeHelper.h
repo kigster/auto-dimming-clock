@@ -10,7 +10,7 @@
 
 #include "../Wallock.h"
 
-#ifdef ENABLE_SET_TIME
+#if ENABLE_SET_TIME
 
 #ifndef TEENSYTIMEMANAGER_H_
 #define TEENSYTIMEMANAGER_H_

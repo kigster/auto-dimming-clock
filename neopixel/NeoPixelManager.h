@@ -8,7 +8,7 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 #include "../Wallock.h"
-#ifdef ENABLE_NEOPIXELS
+#if ENABLE_NEOPIXELS
 
 #ifndef NEOPIXELMANAGER_H_
 #define NEOPIXELMANAGER_H_

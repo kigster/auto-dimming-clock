@@ -14,10 +14,11 @@
  *
  * Author: Konstantin Gredeskoul <kigster@gmail.com>
  */
-
 #include "Wallock.h"
 #include "app/App.h"
+#include "app/AppInstance.h"
 #include "app/State.h"
+
 
 char buffer[100];
 
@@ -43,43 +44,19 @@ Wallock::State state(gvPhotoReadout, gvBrightness);
 Wallock::App app(pinout, state, rotary, matrix);
 SimpleTimer timer;
 
-#ifdef ENABLE_NEOPIXELS
+#if ENABLE_NEOPIXELS
 #include "neopixel/NeoPixelEffects.h"
 #include "neopixel/NeoPixelManager.h"
 #endif
 
-#ifdef TEENSYDUINO
+#if TEENSYDUINO
 time_t getTeensy3Time() {
     return Teensy3Clock.get();
 }
 #endif
 
-void rotaryButtonClick() {
-    Serial.println(F("rotaryButtonClick()"));
-    app.cb_ButtonClick();
-    delay(100);
-}
-void rotaryButtonDoubleClick() {
-    Serial.println(F("rotaryButtonDoubleClick()"));
-    app.cb_ButtonDoubleClick();
-    delay(100);
-}
-void rotaryButtonLongPress() {
-    Serial.println(F("rotaryButtonLongPress()"));
-    app.cb_ButtonHold();
-    delay(100);
-}
-void displayTimeNow() {
-    app.displayCurrentTime();
-}
-void neoPixelRefresh() {
-    app.neoPixelRefresh();
-}
-void neoPixelNextEffect() {
-    app.neoPixelNextEffect();
-}
 
-#ifdef TEENSYDUINO
+#if TEENSYDUINO
 uint32_t freeRam(){ // for Teensy 3.0
     uint32_t stackTop;
     uint32_t heapTop;
@@ -123,50 +100,54 @@ bool detectRTC() {
 
 void setup() {
     Serial.begin(9600);
-#ifdef TEENSYDUINO
+#if TEENSYDUINO
     setSyncProvider(getTeensy3Time);
 #endif
     Serial.println(F("[wallock] v2.1(c) 2015 kiguino.moos.io"));
 
     app.setup();
 
-    app.getButton()->attachClick(rotaryButtonClick);
-    app.getButton()->attachLongPressStart(rotaryButtonLongPress);
-    app.getButton()->attachDoubleClick(rotaryButtonDoubleClick);
+    app.getButton()->attachClick((callbackFunction ) Wallock::callBack_buttonClick);
+    app.getButton()->attachLongPressStart((callbackFunction ) Wallock::callBack_buttonHold);
+    app.getButton()->attachDoubleClick((callbackFunction ) Wallock::callBack_buttonDoubleClick);
 
-    timer.setInterval( 1000, (timer_callback) displayTimeNow);
-    timer.setInterval( 5000, (timer_callback) neoPixelNextEffect);
-    timer.setInterval(    5, (timer_callback) neoPixelRefresh);
+    timer.setInterval( 1000, (timer_callback) Wallock::callBack_displayCurrentTime);
 
+    Wallock::appInstance = &app;
 
-#ifdef ENABLE_SET_TIME
-    #ifdef TEENSYDUINO
-        if (year() < 2014) {
-            Serial.println("[BLOOPERS!]");
-            Serial.print("Year returned is < 2014, resetting time to compile time, 12:00. Year: "); Serial.println(year());
-            app.helper.setDateToCompileTime();
-        } else {
-            Serial.println("[OK]");
+    #if ENABLE_NEOPIXELS
+        timer.setInterval( 5000, (timer_callback) Wallock::callBack_neoPixelNextEffect);
+        timer.setInterval(    5, (timer_callback) Wallock::callBack_neoPixelRefresh);
+    #endif
+
+    #if ENABLE_SET_TIME
+        #if TEENSYDUINO
+            if (year() < 2014) {
+                Serial.println("[BLOOPERS!]");
+                Serial.print("Year returned is < 2014, resetting time to compile time, 12:00. Year: "); Serial.println(year());
+                app.helper.setDateToCompileTime();
+            } else {
+                Serial.println("[OK]");
+            }
+        #else
+            while(!detectRTC()) {
+                Serial.print(F("RTC chip not detected, can not proceed."));
+                delay(1000);
+            }
+        #endif /* TEENSYDUINO */
+    #endif /* ENABLE_SET_TIME */
+
+    #if ENABLE_NEOPIXELS
+        NeoPixelEffects *n = app.neoPixelManager->effects();
+        n->reset();
+        for (int i = 0; i < 3 * 255; i++) {
+            n->fadeCycle();
+            delay(2);
         }
-    #else
-        while(!detectRTC()) {
-            Serial.print(F("RTC chip not detected, can not proceed."));
-            delay(1000);
-        }
-    #endif /* TEENSYDUINO */
-#endif /* ENABLE_SET_TIME */
-
-#ifdef ENABLE_NEOPIXELS
-    NeoPixelEffects *n = app.neoPixelManager->effects();
-    n->reset();
-    for (int i = 0; i < 3 * 255; i++) {
-        n->fadeCycle();
-        delay(2);
-    }
-    n->fadeOut(2000);
-    app.neoPixelManager->shutoff();
-    Serial.println("Setup complete, entering loop...");
-#endif
+        n->fadeOut(2000);
+        app.neoPixelManager->shutoff();
+        Serial.println("Setup complete, entering loop...");
+    #endif
 }
 
 void loop() {

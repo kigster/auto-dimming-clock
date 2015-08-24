@@ -10,7 +10,7 @@
 #include "SetTimeHelper.h"
 #include "../Wallock.h"
 
-#ifdef ENABLE_SET_TIME
+#if ENABLE_SET_TIME
 
 #include <Time.h>
 #include <Arduino.h>
@@ -70,7 +70,7 @@ bool SetTimeHelper::getCompileDate() {
 bool SetTimeHelper::setTimeTo(tmElements_t tm) {
     time_t timeToSet = makeTime(tm);
     setTime(timeToSet);
-#ifdef TEENSYDUINO
+#if TEENSYDUINO
     time_t t = makeTime(tm);
     Teensy3Clock.set(t);
     setTime(t);

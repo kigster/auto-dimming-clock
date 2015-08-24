@@ -9,7 +9,7 @@
  */
 
 #include "../Wallock.h"
-#ifdef ENABLE_MENU
+#if ENABLE_MENU
 
 #ifndef SETTIMEMENU_H_
 #define SETTIMEMENU_H_
@@ -26,6 +26,7 @@ namespace Wallock {
     private:
 
         signed short h, m;
+        unsigned long timeSinceLastModeChange;
         App *app;
         char *what;
         void instructions();

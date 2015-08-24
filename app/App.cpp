@@ -11,6 +11,7 @@
 #include <Arduino.h>
 #include "../Wallock.h"
 #include "App.h"
+#include "AppInstance.h"
 
 namespace Wallock {
     App::App(       PinoutMapping               &_pinout,
@@ -27,13 +28,13 @@ namespace Wallock {
 
         mode = SetTime::Default;
         lastDisplayedTime = 0;
-        #ifdef ENABLE_LCD
+        #if ENABLE_LCD
             lcd = new LiquidCrystal_I2C(0x3F, 20, 4);
         #endif
-        #ifdef ENABLE_NEOPIXELS
+        #if ENABLE_NEOPIXELS
             neoPixelManager = new NeoPixelManager(3, pinout.pinNeoPixels);
         #endif
-        #ifdef ENABLE_MENU
+        #if ENABLE_MENU
             menu.setApp(this);
         #endif
     }
@@ -42,12 +43,12 @@ namespace Wallock {
         matrix.begin(0x70);
         delay(100);
         matrix.clear();
-        #ifdef ENABLE_PHOTORESISTOR
+        #if ENABLE_PHOTORESISTOR
             pinMode(pinout.pinPhotoResistor, INPUT);
             delay(100);
         #endif
 
-        #ifdef ENABLE_LCD
+        #if ENABLE_LCD
             lcd->init();
             // Print a message to the LCD.
             lcd->backlight();
@@ -55,12 +56,12 @@ namespace Wallock {
             debug(2, "Initialization completedl", true);
         #endif
 
-        #ifdef ENABLE_NEOPIXELS
+        #if ENABLE_NEOPIXELS
             neoPixelManager->begin();
         #endif
 
 
-        #ifdef ENABLE_PHOTORESISTOR
+        #if ENABLE_PHOTORESISTOR
             // set initial display brightness based on the photo
             hasPhotoReadingChanged();
             state.getBrightness().follow(&state.getPhotoReadout());
@@ -69,20 +70,38 @@ namespace Wallock {
 
     }
 
+    void App::logStatus() {
+        tmElements_t tm = getCurrentTime();
+
+        sprintf(buffer, "%2d:%02d:%02d <%4d Bytes Free> >> ",
+                        tm.Hour, tm.Minute, tm.Second,
+                        freeRam());
+        Serial.print(buffer);
+        sprintf(buffer, "Brightness: [%2d %3d%%] Sensor: [%3d %3d%%], offset [%4d]",
+                        state.currentBrightness(),
+                        (int)(state.getBrightness().getCurrentAsPercentOfRange()),
+                        state.currentPhotoReadout(),
+                        (int)(state.getPhotoReadout().getCurrentAsPercentOfRange()),
+                        state.getPhotoReadout().offset);
+        Serial.println(buffer);
+    }
+
+
     void App::run() {
         rotary.tick();
+        int brightness = state.currentBrightness();
 
         if (wasKnobRotated()) {
+            hasPhotoReadingChanged();
             state.getPhotoReadout().syncOffsetTo(&state.getBrightness());
-
         } else if (hasPhotoReadingChanged()) {
             state.getBrightness().follow(&state.getPhotoReadout());
+        }
 
-        } else
-            return;
-
-        updateDisplayBrightness();
-        logStatus();
+        if (brightness != state.currentBrightness()) {
+            updateDisplayBrightness();
+            logStatus();
+        }
     }
 
     bool App::wasKnobRotated() {
@@ -97,13 +116,13 @@ namespace Wallock {
     }
 
     bool App::hasPhotoReadingChanged() {
-        #ifdef ENABLE_PHOTORESISTOR
+        #if ENABLE_PHOTORESISTOR
             return state.getPhotoReadout().
                 setCurrent(
                       analogRead(
                            pinout.pinPhotoResistor));
 
-            #ifdef DEBUG
+            #if DEBUG
                 if (millis() - lastDisplayedTime > 1000) {
                     Serial.print("photoresistor readout [0-1023]: ");
                     Serial.println(state.currentPhotoReadout());
@@ -111,7 +130,7 @@ namespace Wallock {
                 }
             #endif
 
-            #ifdef ENABLE_LCD
+            #if ENABLE_LCD
                 lcd->setCursor(0,2);
                 lcd->print("Photo Value: ");
                 sprintf(buffer, "%4d", state.currentPhotoReadout());
@@ -127,6 +146,10 @@ namespace Wallock {
         return state.getValues().clock24hr;
     }
 
+    bool App::flip24hr() {
+        return state.flip24Hr();
+    }
+
     void App::updateDisplayBrightness() {
         matrix.setBrightness(state.currentBrightness());
     }
@@ -136,7 +159,7 @@ namespace Wallock {
     }
 
     void App::debug(int row, const char *message, bool clear) {
-        #ifdef ENABLE_LCD
+        #if ENABLE_LCD
             if (clear)
                 lcd->clear();
             row = row % 4;
@@ -157,7 +180,10 @@ namespace Wallock {
      *
      * hours should always be passed in in a 24 hour format, ie. 0 <= h <= 23
      */
-    void App::displayTime(short h, short m) {
+    void App::displayTime(short hour, short minute) {
+        short h = hour;
+        short m = minute;
+
         if (!state.getValues().displayOn)
             return;
 
@@ -176,12 +202,15 @@ namespace Wallock {
 
         uint8_t                bitmask  = 0x00;
         if (h < 0 || m < 0)    colonOn = false;
+
         if (colonOn)           { bitmask |= 0x02; }
+
 
         // hours
         if (h >= 0) {
-            if (!is24hr() && h >= 12)       { bitmask |= 0x08; } // pm
-            h = h % maxHour();
+            if ((!is24hr() || m < 0) && hour >= 12) { bitmask |= 0x08; } // pm
+            if (h >= maxHour()) { h = h % maxHour(); }
+            if (h == 0)         { h = maxHour(); }
             if (h >= 10)    matrix.writeDigitNum(0, h / 10, false); // leftmost number
                             matrix.writeDigitNum(1, h % 10, false);
         }
@@ -200,13 +229,13 @@ namespace Wallock {
     tmElements_t App::getCurrentTime() {
         tmElements_t tm;
 
-        #ifdef TEENSYDUINO
+        #if TEENSYDUINO
             breakTime(now(), tm);
         #else
             if (!RTC.read(tm)) {
                 if (RTC.chipPresent()) {
                     Serial.println(F("Time chip detected, but not set. Resetting"));
-                    #ifdef ENABLE_SET_TIME
+                    #if ENABLE_SET_TIME
                         helper.setDateToCompileTime();
         #endif
                 } else {
@@ -223,37 +252,24 @@ namespace Wallock {
         return is24hr() ? 24 : 12;
     }
 
-    void App::logStatus() {
-        tmElements_t tm = getCurrentTime();
-
-        sprintf(buffer, "<%2d:%02d:%02d> <%4d free> <%s> <bright %2d, photo [%3d|%4d]> ",
-                        tm.Hour, tm.Minute, tm.Second,
-                        freeRam(),
-                        state.currentBrightness(),
-                        state.currentPhotoReadout(),
-                        state.getPhotoReadout().offset
-        );
-        Serial.println(buffer);
-    }
-
-
-    void App::cb_ButtonClick() {
+    void App::eventClick() {
+        delay(100);
         Serial.print(F("Entering BedTimeApp::cb_ButtonClick, mode = "));
         Serial.println((int) mode);
         if (mode != SetTime::Default) {
-            #ifdef ENABLE_MENU
+            #if ENABLE_MENU
                 menu.nextMode();
             #endif
         } else {
             state.flip24Hr();
-            displayCurrentTime();
-            #ifdef ENABLE_NEOPIXELS
+            #if ENABLE_NEOPIXELS
                 toggleNeoPixels();
             #endif
         }
     }
 
-    void App::cb_ButtonDoubleClick() {
+    void App::eventDblClick() {
+        delay(100);
         if (mode != SetTime::Default) {
             mode = SetTime::Default;
             debug(0, "Cancel Setup", true);
@@ -262,16 +278,15 @@ namespace Wallock {
         }
     }
 
-    void App::cb_ButtonHold() {
+    void App::eventHold() {
         Serial.print(F("Entering BedTimeApp::cb_ButtonHold, mode = "));
         Serial.println((int) mode);
         if (mode == SetTime::Default) {
             Serial.println(F("Mode is Default -> calling configureTime()"));
-    #ifdef ENABLE_MENU
-//            timer.disable(0);
-//            timer.disable(1);
-            menu.configureTime();
-    #endif
+            #if ENABLE_MENU
+                delay(200);
+                menu.configureTime();
+            #endif
         } else {
             Serial.println(F("Mode is not Default, Hold is ignored."));
         }
@@ -287,20 +302,20 @@ namespace Wallock {
 
 
     void App::neoPixelRefresh() {
-        #ifdef ENABLE_NEOPIXELS
+        #if ENABLE_NEOPIXELS
             if (neoPixelsOn)
                 neoPixelManager->refreshEffect();
         #endif
     }
     void App::neoPixelNextEffect() {
-        #ifdef ENABLE_NEOPIXELS
+        #if ENABLE_NEOPIXELS
             if (neoPixelsOn)
                 neoPixelManager->nextEffect();
         #endif
     }
 
     void App::toggleNeoPixels() {
-         #ifdef ENABLE_NEOPIXELS
+         #if ENABLE_NEOPIXELS
             neoPixelsOn = !neoPixelsOn;
             if (neoPixelsOn) {
                 neoPixelManager->nextEffect();
