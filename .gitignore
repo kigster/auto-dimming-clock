@@ -33,4 +33,4 @@ Release
 spec.d
 **/.DS_Store
 arduino/
-.settings/org.eclipse.cdt.core.prefs
+.settings/*
