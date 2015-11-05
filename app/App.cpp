@@ -14,16 +14,29 @@
 #include "AppInstance.h"
 
 namespace Wallock {
+#if ENABLE_ENCODER_RGB
+    App::App(       PinoutMapping               &_pinout,
+                    State                       &_state,
+                    RotaryEncoderWithButton     &_rotary,
+                    Adafruit_7segment           &_matrix,
+                    ColorManager                &_colorManager) :
+                    pinout(_pinout),
+                    state (_state),
+                    rotary(_rotary),
+                    matrix(_matrix),
+                    colorManager(_colorManager),
+                    button(_rotary.button)
+#else
     App::App(       PinoutMapping               &_pinout,
                     State                       &_state,
                     RotaryEncoderWithButton     &_rotary,
                     Adafruit_7segment           &_matrix) :
-
                     pinout(_pinout),
                     state (_state),
                     rotary(_rotary),
                     matrix(_matrix),
                     button(_rotary.button)
+#endif
     {
 
         mode = SetTime::Default;
@@ -63,7 +76,7 @@ namespace Wallock {
 
         #if ENABLE_PHOTORESISTOR
             // set initial display brightness based on the photo
-            hasPhotoReadingChanged();
+            readPhotoTrueIfChanged();
             state.getBrightness().follow(&state.getPhotoReadout());
             updateDisplayBrightness();
         #endif
@@ -73,11 +86,12 @@ namespace Wallock {
     void App::logStatus() {
         tmElements_t tm = getCurrentTime();
 
-        sprintf(buffer, "%2d:%02d:%02d <%4d Bytes Free> >> ",
+        sprintf(buffer, "%2d/%2d/%4d %2d:%02d:%02d | FREE MEM: %4dB | ",
+                        tm.Month, tm.Day, tmYearToCalendar(tm.Year),
                         tm.Hour, tm.Minute, tm.Second,
                         freeRam());
         Serial.print(buffer);
-        sprintf(buffer, "Brightness: [%2d %3d%%] Sensor: [%3d %3d%%], offset [%4d]",
+        sprintf(buffer, "BRT: %2d ~%3d%% | PHT: %3d ~%3d%% | OFF: %3d",
                         state.currentBrightness(),
                         (int)(state.getBrightness().getCurrentAsPercentOfRange()),
                         state.currentPhotoReadout(),
@@ -92,9 +106,10 @@ namespace Wallock {
         int brightness = state.currentBrightness();
 
         if (wasKnobRotated()) {
-            hasPhotoReadingChanged();
             state.getPhotoReadout().syncOffsetTo(&state.getBrightness());
-        } else if (hasPhotoReadingChanged()) {
+        }
+
+        if (readPhotoTrueIfChanged()) {
             state.getBrightness().follow(&state.getPhotoReadout());
         }
 
@@ -107,7 +122,7 @@ namespace Wallock {
     bool App::wasKnobRotated() {
         long delta = rotary.delta();
         if (abs(delta) >= 2) {
-            delta = (delta > 0) ? 1 : -1;
+            delta = (delta > 0) ? min(delta, 2) : max(delta, -2);
             if (state.getBrightness().changeCurrentBy(delta)) {
                 return true;
             }
@@ -115,17 +130,16 @@ namespace Wallock {
         return false;
     }
 
-    bool App::hasPhotoReadingChanged() {
+    bool App::readPhotoTrueIfChanged() {
         #if ENABLE_PHOTORESISTOR
-            return state.getPhotoReadout().
-                setCurrent(
-                      analogRead(
-                           pinout.pinPhotoResistor));
+            int reading = analogRead(pinout.pinPhotoResistor);
+            bool changed = state.getPhotoReadout().setCurrent(reading);
 
             #if DEBUG
-                if (millis() - lastDisplayedTime > 1000) {
-                    Serial.print("photoresistor readout [0-1023]: ");
-                    Serial.println(state.currentPhotoReadout());
+                if (changed || millis() - lastDisplayedTime > 5000) {
+                    sprintf(buffer, "PHOTO ACTUAL: (%3d) {0..1023} | ", reading);
+                    Serial.print(buffer);
+                    logStatus();
                     lastDisplayedTime = millis();
                 }
             #endif
@@ -136,6 +150,9 @@ namespace Wallock {
                 sprintf(buffer, "%4d", state.currentPhotoReadout());
                 lcd->print(buffer);
             #endif
+
+            return changed;
+
         #else
             return false;
         #endif
@@ -236,7 +253,7 @@ namespace Wallock {
                 if (RTC.chipPresent()) {
                     Serial.println(F("Time chip detected, but not set. Resetting"));
                     #if ENABLE_SET_TIME
-                        helper.setDateToCompileTime();
+                        helper.setTimeToCompileTime();
         #endif
                 } else {
                     matrix.printError();
@@ -269,7 +286,22 @@ namespace Wallock {
     }
 
     void App::eventDblClick() {
-        delay(100);
+        Serial.print(F("Entering BedTimeApp::cb_ButtonHold, mode = "));
+        Serial.println((int) mode);
+        if (mode == SetTime::Default) {
+           Serial.println(F("Mode is Default -> calling configureTime()"));
+           #if ENABLE_MENU
+               delay(200);
+               menu.configureTime();
+               delay(200);
+           #endif
+        } else {
+           Serial.println(F("Mode is not Default, Hold is ignored."));
+        }
+    }
+
+    void App::eventHold() {
+        delay(200);
         if (mode != SetTime::Default) {
             mode = SetTime::Default;
             debug(0, "Cancel Setup", true);
@@ -278,19 +310,6 @@ namespace Wallock {
         }
     }
 
-    void App::eventHold() {
-        Serial.print(F("Entering BedTimeApp::cb_ButtonHold, mode = "));
-        Serial.println((int) mode);
-        if (mode == SetTime::Default) {
-            Serial.println(F("Mode is Default -> calling configureTime()"));
-            #if ENABLE_MENU
-                delay(200);
-                menu.configureTime();
-            #endif
-        } else {
-            Serial.println(F("Mode is not Default, Hold is ignored."));
-        }
-    }
     void App::toggleDisplay() {
         state.flipDisplayOn();
         matrix.clear();

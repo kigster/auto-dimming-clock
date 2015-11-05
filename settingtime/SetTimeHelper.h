@@ -15,6 +15,8 @@
 #ifndef TEENSYTIMEMANAGER_H_
 #define TEENSYTIMEMANAGER_H_
 
+#define COMPILE_TIME_AND_BOOTLOADER_DELAY 40000
+
 #include <Time.h>
 #include <DS1307RTC.h>
 
@@ -23,15 +25,17 @@ typedef void(*timeCallback)(tmElements_t);
 class SetTimeHelper {
 public:
     SetTimeHelper();
-    bool setDateToCompileTime();
+    bool setTimeToCompileTime();
     bool setTimeTo(uint8_t h, uint8_t m);
-    bool setTimeTo(tmElements_t tm);
-
+    bool setTimeTo(tmElements_t tm, time_t offset);
+    bool changeTimeToCompileTimeIfNeeded();
+    tmElements_t currentTime;
+    tmElements_t compiledAt;
 private:
-    tmElements_t tm;
     char *monthNames[12];
-    bool getCompileDate();
-    bool getCompileTime();
+    bool retrieveCompileTime();
+//    time_t currentDateTime();
+//    time_t compileDateTime();
 };
 
 #endif /* TIMEMANAGER_H_ */

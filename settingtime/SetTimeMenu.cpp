@@ -32,6 +32,11 @@ namespace Wallock {
     }
 
     void SetTimeMenu::nextMode() {
+#if ENABLE_ENCODER_RGB
+        app->colorManager.setColor(Wallock::Colors::aliceblue);
+        delay(200);
+        app->colorManager.off();
+#endif
 //        long now = millis();
 //        app->getButton()->tick();
 //        if (now - timeSinceLastModeChange < 1000)
@@ -62,6 +67,9 @@ namespace Wallock {
         #endif
         switch (app->mode) {
             case SetTime::Hour:
+                #if ENABLE_ENCODER_RGB
+                    app->colorManager.setColor(Wallock::Colors::lavender);
+                #endif
                 app->debug(0, "====== Setup =======", true);
                 instructions();
                 what = (char *) "Hours";
@@ -72,6 +80,9 @@ namespace Wallock {
                 /* no break */
 
             case SetTime::Minute:
+                #if ENABLE_ENCODER_RGB
+                    app->colorManager.setColor(Wallock::Colors::honeydew);
+                #endif
                 what = (char *) "Minutes";
                 m = tm.Minute;
                 selectNumber(&m, 0, 59);
@@ -79,6 +90,9 @@ namespace Wallock {
                 /* no break */
 
             case SetTime::Save:
+                #if ENABLE_ENCODER_RGB
+                    app->colorManager.setColor(Wallock::Colors::aqua);
+                #endif
                 if (h == 24) { h = 0; }
                 tm.Hour = h;
                 tm.Minute = m;
@@ -91,12 +105,19 @@ namespace Wallock {
                     app->debug(1, buffer, false);
                     app->debug(3, "Success! :)", false);
                 #endif
-                app->helper.setTimeTo(tm);
+                #if ENABLE_ENCODER_RGB
+                    app->colorManager.setColor(Wallock::Colors::blanchedalmond);
+                #endif
+                app->helper.setTimeTo(tm, 0);
                 nextMode();
                 /* no break */
 
             case SetTime::Last:
                 app->mode = SetTime::Default;
+                #if ENABLE_ENCODER_RGB
+                    app->colorManager.off();
+                #endif
+
                 /* no break */
 
             case SetTime::Default:

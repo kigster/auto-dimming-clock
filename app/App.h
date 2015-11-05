@@ -30,6 +30,11 @@
 #include "../neopixel/NeoPixelEffects.h"
 #endif
 
+#if ENABLE_ENCODER_RGB
+#include "ColorManager.h"
+#endif
+
+
 namespace SetTime {
     typedef enum TimeChangeMode_e {
         Default = (1 << 0), Hour = (1 << 1), Minute = (1 << 2), Save = (1 << 4), Last = (1 << 5),
@@ -38,12 +43,12 @@ namespace SetTime {
 
 
 namespace Wallock {
-
     typedef struct PinoutMapping_s {
          uint8_t pinPhotoResistor;
          uint8_t pinRotaryLeft;
          uint8_t pinRotaryRight;
          uint8_t pinRotaryButton;
+         uint8_t rgb[3];
          uint8_t pinNeoPixels;
      } PinoutMapping;
 
@@ -59,15 +64,28 @@ namespace Wallock {
             uint32_t                                    lastDisplayedTime;
             void logStatus();
 
-            bool hasPhotoReadingChanged();
+            bool readPhotoTrueIfChanged();
             bool wasKnobRotated();
 
         public:
+#if ENABLE_ENCODER_RGB
             App(            PinoutMapping               &_pinout,
                             State                       &_state,
                             RotaryEncoderWithButton     &_rotary,
-                            Adafruit_7segment           &_matrix);
+                            Adafruit_7segment           &_matrix,
+                            ColorManager                &_color
+            );
+#else
+            App(            PinoutMapping               &_pinout,
+                            State                       &_state,
+                            RotaryEncoderWithButton     &_rotary,
+                            Adafruit_7segment           &_matrix
+            );
 
+#endif
+#if ENABLE_ENCODER_RGB
+            ColorManager                                &colorManager;
+#endif
             SetTime::TimeMode mode;
 
             #if ENABLE_LCD

@@ -12,6 +12,7 @@
 
 #if ENABLE_SET_TIME
 
+
 #include <Time.h>
 #include <Arduino.h>
 
@@ -22,32 +23,51 @@ static const char *monthNamesList[12] = {
 
 SetTimeHelper::SetTimeHelper() {
     for (int i = 0; i < 12; i ++) { monthNames[i] = (char *)monthNamesList[i]; }
-    makeTime(tm);
-
+    breakTime(now(), currentTime);
+    retrieveCompileTime();
 }
 
-bool SetTimeHelper::setDateToCompileTime() {
+bool SetTimeHelper::changeTimeToCompileTimeIfNeeded() {
+    time_t tt_now = makeTime(currentTime);
+    time_t tt_compiled = makeTime(compiledAt);
+    if (tt_now < tt_compiled) {
+        setTimeToCompileTime();
+        return true;
+    }
+
+    return false;
+}
+
+bool SetTimeHelper::setTimeToCompileTime() {
     // get the date and time the compiler was run
-    if (getCompileDate() && getCompileTime()) {
-        // and configure the RTC with this info
-        tm.Hour = 12;
-        tm.Minute = 0;
-        return setTimeTo(tm);
+    if (retrieveCompileTime()) {
+        return setTimeTo(compiledAt, millis() + COMPILE_TIME_AND_BOOTLOADER_DELAY);
     }
     return false;
 }
 
-bool SetTimeHelper::getCompileTime() {
+bool SetTimeHelper::setTimeTo(tmElements_t tm, time_t offset) {
+    time_t timeToSet = makeTime(tm);
+    setTime(timeToSet);
+#if TEENSYDUINO
+    Teensy3Clock.set(timeToSet);
+    return true;
+#else
+    return (bool) RTC.write(tm);
+#endif
+}
+
+// private
+
+bool SetTimeHelper::retrieveCompileTime() {
     int Hour, Min, Sec;
     if (sscanf(__TIME__, "%d:%d:%d", &Hour, &Min, &Sec) != 3)
         return false;
-    tm.Hour = Hour;
-    tm.Minute = Min;
-    tm.Second = Sec;
-    return true;
-}
 
-bool SetTimeHelper::getCompileDate() {
+    compiledAt.Hour = Hour;
+    compiledAt.Minute = Min;
+    compiledAt.Second = Sec;
+
     char Month[12];
     int Day, Year;
     uint8_t monthIndex;
@@ -59,29 +79,15 @@ bool SetTimeHelper::getCompileDate() {
         if (strcmp(Month, monthNames[monthIndex]) == 0)
             break;
     }
+
     if (monthIndex >= 12)
         return false;
-    tm.Day = Day;
-    tm.Month = monthIndex + 1;
-    tm.Year = CalendarYrToTm(Year);
+    compiledAt.Day = Day;
+    compiledAt.Month = monthIndex + 1;
+    compiledAt.Year = CalendarYrToTm(Year);
+
     return true;
 }
 
-bool SetTimeHelper::setTimeTo(tmElements_t tm) {
-    time_t timeToSet = makeTime(tm);
-    setTime(timeToSet);
-#if TEENSYDUINO
-    time_t t = makeTime(tm);
-    Teensy3Clock.set(t);
-    setTime(t);
-    return true;
-#else
-    if (RTC.write(tm)) {
-        return true;
-    } else {
-        return true;
-    }
-#endif
-}
 
 #endif

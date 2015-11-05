@@ -15,12 +15,15 @@
 #define ENABLE_SET_TIME        true
 #define ENABLE_MENU            true
 #define ENABLE_LCD             false
+#define ENABLE_ENCODER_RGB     false
 #define ENABLE_NEOPIXELS       false
 
 #define DEBUG                  false
 
 #define BRIGHTNESS_MAX          15
 #define BRIGHTNESS_MIN           0
+
+#define ENCODER_USE_INTERRUPTS true
 
 #include "Arduino.h"
 
