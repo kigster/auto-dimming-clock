@@ -21,23 +21,27 @@
 #endif
 
 #if ENABLE_SET_TIME
-#include "../settingtime/SetTimeHelper.h"
-#include "../settingtime/SetTimeMenu.h"
+#include "SetTimeHelper.h"
+#include "SetTimeMenu.h"
 #endif
 
 #if ENABLE_NEOPIXELS
-#include "../neopixel/NeoPixelManager.h"
-#include "../neopixel/NeoPixelEffects.h"
+#include "NeoPixelManager.h"
+#include "NeoPixelEffects.h"
 #endif
 
 #if ENABLE_ENCODER_RGB
-#include "ColorManager.h"
+#include "RGBEncoder.h"
 #endif
 
 
 namespace SetTime {
     typedef enum TimeChangeMode_e {
-        Default = (1 << 0), Hour = (1 << 1), Minute = (1 << 2), Save = (1 << 4), Last = (1 << 5),
+        Default = (1 << 0),
+        Hour    = (1 << 1),
+        Minute  = (1 << 2),
+        Save    = (1 << 4),
+        Last    = (1 << 5),
     } TimeMode;
 };
 
@@ -66,6 +70,7 @@ namespace Wallock {
 
             bool readPhotoTrueIfChanged();
             bool wasKnobRotated();
+            void showColor(long color);
 
         public:
 #if ENABLE_ENCODER_RGB
@@ -73,7 +78,7 @@ namespace Wallock {
                             State                       &_state,
                             RotaryEncoderWithButton     &_rotary,
                             Adafruit_7segment           &_matrix,
-                            ColorManager                &_color
+                            RGBEncoder                &_color
             );
 #else
             App(            PinoutMapping               &_pinout,
@@ -84,7 +89,7 @@ namespace Wallock {
 
 #endif
 #if ENABLE_ENCODER_RGB
-            ColorManager                                &colorManager;
+            RGBEncoder                                &colorManager;
 #endif
             SetTime::TimeMode mode;
 

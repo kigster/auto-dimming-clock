@@ -32,6 +32,7 @@ namespace Wallock {
         void instructions();
         void updateTimeCallback();
         void selectNumber(signed short *current, int min, int max);
+        void blinkColor(long color);
 
     };
 }

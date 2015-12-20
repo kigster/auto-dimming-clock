@@ -17,8 +17,8 @@
 #include "Wallock.h"
 #include "app/App.h"
 #include "app/AppInstance.h"
+#include "app/RGBEncoder.h"
 #include "app/State.h"
-#include "app/ColorManager.h"
 
 
 char buffer[200];
@@ -32,17 +32,22 @@ Wallock::PinoutMapping pinout = {
          2,     // Left Rotary
          3,     // Right Rotary
          4,     // Rotary Button
- { 9,10,11 },   // RGB rotary pins
+ { 9, 10, 11 }, // RGB LED pins, must support PWM, typically  3, 5, 6, 9, 10, and 11.
          2      // Number of NeoPixels
 };
 
 RotaryEncoderWithButton rotary(
                 (uint8_t) pinout.pinRotaryLeft,
                 (uint8_t) pinout.pinRotaryRight,
-                (uint8_t) pinout.pinRotaryButton);
+                (uint8_t) pinout.pinRotaryButton,
+                ENCODER_BTN_ACTIVE_LOW
+                );
 
 #if ENABLE_ENCODER_RGB
-    Wallock::ColorManager colorManager(pinout.rgb[0], pinout.rgb[1], pinout.rgb[2]);
+    Wallock::RGBEncoder colorManager(
+            pinout.rgb[0],
+            pinout.rgb[1],
+            pinout.rgb[2]);
 #endif
 
 Adafruit_7segment matrix;
@@ -57,8 +62,8 @@ Wallock::State state(gvPhotoReadout, gvBrightness);
 SimpleTimer timer;
 
 #if ENABLE_NEOPIXELS
-#include "neopixel/NeoPixelEffects.h"
-#include "neopixel/NeoPixelManager.h"
+#include "app/NeoPixelEffects.h"
+#include "app/NeoPixelManager.h"
 #endif
 
 #if TEENSYDUINO
@@ -132,10 +137,6 @@ void setup() {
 #endif
     Serial.println(F("[wallock] v3.0(c) 2015 kiguino.moos.io"));
 
-#if ENABLE_ENCODER_RGB
-    colorManager.init();
-#endif
-
     app.setup();
 
     app.getButton()->attachClick((callbackFunction ) Wallock::callBack_buttonClick);
@@ -145,6 +146,17 @@ void setup() {
     timer.setInterval( 1000, (timer_callback) Wallock::callBack_displayCurrentTime);
 
     Wallock::appInstance = &app;
+
+#if ENABLE_ENCODER_RGB
+    colorManager.setup();
+    long colorLoop[] = { Colors::red, Colors::blue, Colors::green, Colors::purple, Colors::orange };
+    uint8_t numColors = sizeof(colorLoop) / sizeof(long);
+    for (int i = 0; i < numColors; i++) {
+      colorManager.rgb(colorLoop[i]);
+      delay(200);
+    }
+    colorManager.off();
+#endif
 
     #if ENABLE_NEOPIXELS
         timer.setInterval( 5000, (timer_callback) Wallock::callBack_neoPixelNextEffect);

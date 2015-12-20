@@ -19,7 +19,7 @@ namespace Wallock {
                     State                       &_state,
                     RotaryEncoderWithButton     &_rotary,
                     Adafruit_7segment           &_matrix,
-                    ColorManager                &_colorManager) :
+                    RGBEncoder                &_colorManager) :
                     pinout(_pinout),
                     state (_state),
                     rotary(_rotary),
@@ -103,13 +103,12 @@ namespace Wallock {
 
     void App::run() {
         rotary.tick();
+        colorManager.tick();
         int brightness = state.currentBrightness();
 
         if (wasKnobRotated()) {
             state.getPhotoReadout().syncOffsetTo(&state.getBrightness());
-        }
-
-        if (readPhotoTrueIfChanged()) {
+        } else if (readPhotoTrueIfChanged()) {
             state.getBrightness().follow(&state.getPhotoReadout());
         }
 
@@ -121,7 +120,7 @@ namespace Wallock {
 
     bool App::wasKnobRotated() {
         long delta = rotary.delta();
-        if (abs(delta) >= 2) {
+        if (abs(delta) >= 1) {
             delta = (delta > 0) ? min(delta, 2) : max(delta, -2);
             if (state.getBrightness().changeCurrentBy(delta)) {
                 return true;
@@ -157,6 +156,12 @@ namespace Wallock {
             return false;
         #endif
 
+    }
+
+    void App::showColor(long color) {
+#if ENABLE_ENCODER_RGB
+      colorManager.rgbBlink(color, 500);
+#endif
     }
 
     bool App::is24hr() {
@@ -201,9 +206,6 @@ namespace Wallock {
         short h = hour;
         short m = minute;
 
-        if (!state.getValues().displayOn)
-            return;
-
         if (h < 0 && m < 0) return;
 
         // For dots and the colon:
@@ -214,14 +216,24 @@ namespace Wallock {
         // 0x10 - decimal point
 
         matrix.clear();
-        state.flipColon();
         bool colonOn = state.getValues().colonOn;
-
         uint8_t                bitmask  = 0x00;
-        if (h < 0 || m < 0)    colonOn = false;
-
-        if (colonOn)           { bitmask |= 0x02; }
-
+        if (h < 0 || m < 0) {
+          // configuring time
+          colonOn = false;
+        }
+        else {
+          // showing time
+          if (!state.getValues().displayOn)
+              return;
+          state.flipColon();
+          if (colonOn) {
+            showColor(Colors::aqua);
+            bitmask |= 0x02;
+          } else {
+            showColor(Colors::darkblue);
+          }
+        }
 
         // hours
         if (h >= 0) {
@@ -270,7 +282,6 @@ namespace Wallock {
     }
 
     void App::eventClick() {
-        delay(100);
         Serial.print(F("Entering BedTimeApp::cb_ButtonClick, mode = "));
         Serial.println((int) mode);
         if (mode != SetTime::Default) {
@@ -285,6 +296,7 @@ namespace Wallock {
         }
     }
 
+
     void App::eventDblClick() {
         Serial.print(F("Entering BedTimeApp::cb_ButtonHold, mode = "));
         Serial.println((int) mode);
@@ -295,19 +307,12 @@ namespace Wallock {
                menu.configureTime();
                delay(200);
            #endif
-        } else {
-           Serial.println(F("Mode is not Default, Hold is ignored."));
         }
     }
 
     void App::eventHold() {
         delay(200);
-        if (mode != SetTime::Default) {
-            mode = SetTime::Default;
-            debug(0, "Cancel Setup", true);
-        } else {
-            toggleDisplay();
-        }
+        toggleDisplay();
     }
 
     void App::toggleDisplay() {
@@ -315,7 +320,7 @@ namespace Wallock {
         matrix.clear();
         matrix.writeDisplay();
         if (state.getValues().displayOn) {
-            displayCurrentTime();
+          displayCurrentTime();
         }
     }
 

@@ -11,19 +11,24 @@
 #ifndef _WALLOCK_H_
 #define _WALLOCK_H_
 
-#define ENABLE_PHOTORESISTOR   true
-#define ENABLE_SET_TIME        true
-#define ENABLE_MENU            true
-#define ENABLE_LCD             false
-#define ENABLE_ENCODER_RGB     false
-#define ENABLE_NEOPIXELS       false
+#include <Arduino.h>
 
-#define DEBUG                  false
+#define ENABLE_PHOTORESISTOR        true
+#define ENABLE_SET_TIME             true
+#define ENABLE_MENU                 true
+#define ENABLE_LCD                  false
+#define ENABLE_ENCODER_RGB          true
+#define ENABLE_NEOPIXELS            false
+#define ENCODER_USE_INTERRUPTS      true
 
-#define BRIGHTNESS_MAX          15
-#define BRIGHTNESS_MIN           0
+#define BRIGHTNESS_MAX              15
+#define BRIGHTNESS_MIN              0
 
-#define ENCODER_USE_INTERRUPTS true
+#define ENCODER_BTN_ACTIVE_LOW      0
+#define ENCODER_RGB_OFF_STATE       HIGH
+
+#define DEBUG                       false
+#define ANALOG_OUTPUT_RESOLUTION    256
 
 #include "Arduino.h"
 
