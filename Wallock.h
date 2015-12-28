@@ -29,6 +29,7 @@
 
 #define DEBUG                       false
 #define ANALOG_OUTPUT_RESOLUTION    256
+#define LOAD_COLOR_NAMES            true
 
 #include "Arduino.h"
 

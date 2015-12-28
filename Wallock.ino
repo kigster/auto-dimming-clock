@@ -17,7 +17,7 @@
 #include "Wallock.h"
 #include "app/App.h"
 #include "app/AppInstance.h"
-#include "app/RGBEncoder.h"
+#include "app/RGBColorController.h"
 #include "app/State.h"
 
 
@@ -44,7 +44,7 @@ RotaryEncoderWithButton rotary(
                 );
 
 #if ENABLE_ENCODER_RGB
-    Wallock::RGBEncoder colorManager(
+    Wallock::RGBController colorManager(
             pinout.rgb[0],
             pinout.rgb[1],
             pinout.rgb[2]);
@@ -149,10 +149,10 @@ void setup() {
 
 #if ENABLE_ENCODER_RGB
     colorManager.setup();
-    long colorLoop[] = { Colors::red, Colors::blue, Colors::green, Colors::purple, Colors::orange };
+    long colorLoop[] = { ColorNames::red, ColorNames::blue, ColorNames::green, ColorNames::purple, ColorNames::orange };
     uint8_t numColors = sizeof(colorLoop) / sizeof(long);
     for (int i = 0; i < numColors; i++) {
-      colorManager.rgb(colorLoop[i]);
+      colorManager.setColor(colorLoop[i]);
       delay(200);
     }
     colorManager.off();

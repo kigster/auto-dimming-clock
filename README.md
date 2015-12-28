@@ -1,11 +1,13 @@
-Just imagine, the
 
-Digital Clock for your Bed
+Auto-Dimming Clock with Seven-Segment Digital Display
 =========
 
-with a rotary encoder knob (the type that also has  a button), and a strip of 3 neo pixels illuminating your mid-sleep bathroom trip in pretty colors! Now that's life.  
+This is a repo for a series of related clocks I made for myself and friends.  They range from mid-sized bed clocks to wall clocks, some have
+RGB lights, some do not, etc. 
 
-The clock is powered by Arduino-compatible, but much more powerful [Teensy 3.1](https://www.pjrc.com/teensy/teensy31.html). Yes, teensy is probably an overkill for this project, but it does provide some interesting options for reprogramming this clock in the future. There is a way to access Teensy's USB port, and so it is pretty easy to hook the clock to a computer running Arduino with an AVR build tool chain and update the source. This project folder maps to an Eclipse project, as I use Eclipse Arduino extension, retrofitted to work with Teensy.
+Typically clocks are controlled with a rotary encoder knob (the type that also has a button).
+
+This clock has been build with Teensy, Arduino Nano and Pro Micro.
 
 Overview
 =============
@@ -14,8 +16,13 @@ The clock is equipped with:
 
 * light sensor (beneath the rotary knob) which automatically adjust brightness by up to 50% in either direction, depending on the light around (it is attached to a 10K resistor).
 * rotary knob with a built-in button functionality
-* 3 "neo pixel" RGB LEDs
+* 3 "neo pixel" RGB LEDs (optional)
 * Adafruit 7-segment I2C display for the time display
+
+Additional features include:
+* WiFi card
+* Humidity/Temperature sensor
+* Potentiometer for adjusting the range of affect of the photo-sensor.
 
 The enclosure you see on the picture is made from 1/8" acrylic using matte black color, and semi-transparent black for the front panel.
 
@@ -32,7 +39,7 @@ When the clock is running, you can:
 * moving rotary knob in this mode changes the brightness. There are 16 total values for brightness, from 0 to 15.
 * press and hold enters the menu to set the time
   * Once in the menu setup, rotating the knob changes the current hour.  When done, click the knob once.
-	  * If during either hour or minutes setup you rather cancel this process, double click the button.
+      * If during either hour or minutes setup you rather cancel this process, double click the button.
   * Now change the minutes, and when ready click the knob once.
   * Now the time will be set and saved, and configuration mode is finished.
     

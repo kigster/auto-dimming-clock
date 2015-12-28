@@ -11,7 +11,7 @@
 #if ENABLE_MENU
 #include "SetTimeMenu.h"
 #include "App.h"
-#include "Colors.h"
+#include "RGBColor.h"
 
 namespace Wallock {
   SetTimeMenu::SetTimeMenu(Wallock::App *application) {
@@ -34,7 +34,7 @@ namespace Wallock {
 
   void SetTimeMenu::blinkColor(long color) {
 #if ENABLE_ENCODER_RGB
-    app->colorManager.rgbBlink(color, 250);
+    app->colorManager.blink(color, 250);
 #endif
   }
 
@@ -70,7 +70,7 @@ namespace Wallock {
 #endif
     switch (app->mode) {
       case SetTime::Hour:
-        blinkColor(Colors::red);
+        blinkColor(ColorNames::red);
         app->debug(0, "====== Setup =======", true);
         instructions();
         what = (char *) "Hours";
@@ -83,7 +83,7 @@ namespace Wallock {
         /* no break */
 
       case SetTime::Minute:
-        blinkColor(Colors::yellow);
+        blinkColor(ColorNames::yellow);
         what = (char *) "Minutes";
         m = tm.Minute;
         selectNumber(&m, 0, 59);
@@ -91,7 +91,7 @@ namespace Wallock {
         /* no break */
 
       case SetTime::Save:
-        blinkColor(Colors::red);
+        blinkColor(ColorNames::red);
         if (h == 24) {
           h = 0;
         }
@@ -139,7 +139,7 @@ namespace Wallock {
         continue;
       }
 
-      delta = (delta > 0) ? 1 : -1;
+      delta = (delta > 0) ? -1 : 1;
 
       signed short prev = *current;
       *current = *current + delta;

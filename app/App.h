@@ -31,7 +31,7 @@
 #endif
 
 #if ENABLE_ENCODER_RGB
-#include "RGBEncoder.h"
+#include "RGBColorController.h"
 #endif
 
 
@@ -66,6 +66,7 @@ namespace Wallock {
             OneButton                                   &button;
 
             uint32_t                                    lastDisplayedTime;
+            long                                        currentColorIndex;
             void logStatus();
 
             bool readPhotoTrueIfChanged();
@@ -78,7 +79,7 @@ namespace Wallock {
                             State                       &_state,
                             RotaryEncoderWithButton     &_rotary,
                             Adafruit_7segment           &_matrix,
-                            RGBEncoder                &_color
+                            RGBController                &_color
             );
 #else
             App(            PinoutMapping               &_pinout,
@@ -89,7 +90,7 @@ namespace Wallock {
 
 #endif
 #if ENABLE_ENCODER_RGB
-            RGBEncoder                                &colorManager;
+            RGBController                                &colorManager;
 #endif
             SetTime::TimeMode mode;
 

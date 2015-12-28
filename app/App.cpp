@@ -19,7 +19,7 @@ namespace Wallock {
                     State                       &_state,
                     RotaryEncoderWithButton     &_rotary,
                     Adafruit_7segment           &_matrix,
-                    RGBEncoder                &_colorManager) :
+                    RGBController                &_colorManager) :
                     pinout(_pinout),
                     state (_state),
                     rotary(_rotary),
@@ -160,7 +160,7 @@ namespace Wallock {
 
     void App::showColor(long color) {
 #if ENABLE_ENCODER_RGB
-      colorManager.rgbBlink(color, 500);
+      colorManager.blink(color, 1010, 1);
 #endif
     }
 
@@ -205,9 +205,35 @@ namespace Wallock {
     void App::displayTime(short hour, short minute) {
         short h = hour;
         short m = minute;
+        static rgb_color_t cycleColors[] = {
+                ColorNames::aqua,
+                ColorNames::palevioletred,
+                ColorNames::maroon,
+                ColorNames::indigo,
+                ColorNames::burlywood,
+                ColorNames::darkgoldenrod,
+                ColorNames::darkred,
+                ColorNames::teal,
+                ColorNames::mediumpurple,
+                ColorNames::deeppink,
+                ColorNames::crimson,
+                ColorNames::magenta,
+                ColorNames::lightsteelblue,
+                ColorNames::olivedrab,
+                ColorNames::orchid,
+                ColorNames::peru,
+                ColorNames::orangered,
+                ColorNames::plum,
+                ColorNames::thistle,
+                ColorNames::turquoise,
+                ColorNames::seagreen,
+        };
 
+        size_t cycleColorsNum = sizeof(cycleColors) / sizeof(rgb_color_t);
         if (h < 0 && m < 0) return;
-
+        currentColorIndex = (h*60 + m) % cycleColorsNum;
+        rgb_color_t now_color = (rgb_color_t) cycleColors[currentColorIndex];
+        rgb_color_t next_color = (rgb_color_t) cycleColors[(currentColorIndex + 1) % cycleColorsNum];
         // For dots and the colon:
 
         // 0x02 - left colon - lower dot
@@ -228,11 +254,9 @@ namespace Wallock {
               return;
           state.flipColon();
           if (colonOn) {
-            showColor(Colors::aqua);
             bitmask |= 0x02;
-          } else {
-            showColor(Colors::darkblue);
           }
+          colorManager.fade(now_color, next_color, 500);
         }
 
         // hours
@@ -312,7 +336,14 @@ namespace Wallock {
 
     void App::eventHold() {
         delay(200);
-        toggleDisplay();
+        if (colorManager.isEnabled()) {
+          colorManager.disable();
+        } else {
+          toggleDisplay();
+          if (state.getValues().displayOn) {
+            colorManager.enable();
+          }
+        }
     }
 
     void App::toggleDisplay() {
