@@ -8,8 +8,8 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 
-#ifndef APP_RGBCOLORCONTROLLER_H_
-#define APP_RGBCOLORCONTROLLER_H_
+#ifndef APP_RGBCONTROLLER_H_
+#define APP_RGBCONTROLLER_H_
 
 #if ENABLE_ENCODER_RGB
 
@@ -209,4 +209,4 @@ private:
 
 } /* namespace Wallock */
 
-#endif /* APP_RGBCOLORCONTROLLER_H_ */
+#endif /* APP_RGBCONTROLLER_H_ */

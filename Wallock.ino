@@ -17,7 +17,7 @@
 #include "Wallock.h"
 #include "app/App.h"
 #include "app/AppInstance.h"
-#include "app/RGBColorController.h"
+#include "app/RGBController.h"
 #include "app/State.h"
 
 

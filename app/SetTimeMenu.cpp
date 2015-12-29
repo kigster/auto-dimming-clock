@@ -34,7 +34,7 @@ namespace Wallock {
 
   void SetTimeMenu::blinkColor(long color) {
 #if ENABLE_ENCODER_RGB
-    app->colorManager.blink(color, 250);
+    app->rgbController.blink(color, 250);
 #endif
   }
 
@@ -130,7 +130,7 @@ namespace Wallock {
         break;
 
 #if ENABLE_ENCODER_RGB
-      app->colorManager.tick();
+      app->rgbController.tick();
 #endif
 
       int delta = app->getRotary()->delta();

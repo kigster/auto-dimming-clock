@@ -31,6 +31,9 @@
 #define ANALOG_OUTPUT_RESOLUTION    256
 #define LOAD_COLOR_NAMES            true
 
+
+#define CYCLE_COLOR_THEME_ONE`
+
 #include "Arduino.h"
 
 #include <RotaryEncoderWithButton.h>

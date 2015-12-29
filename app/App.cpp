@@ -19,12 +19,12 @@ namespace Wallock {
                     State                       &_state,
                     RotaryEncoderWithButton     &_rotary,
                     Adafruit_7segment           &_matrix,
-                    RGBController                &_colorManager) :
+                    RGBController               &_colorManager) :
                     pinout(_pinout),
                     state (_state),
                     rotary(_rotary),
                     matrix(_matrix),
-                    colorManager(_colorManager),
+                    rgbController(_colorManager),
                     button(_rotary.button)
 #else
     App::App(       PinoutMapping               &_pinout,
@@ -50,9 +50,13 @@ namespace Wallock {
         #if ENABLE_MENU
             menu.setApp(this);
         #endif
+        #if ENABLE_ENCODER_RGB
+        patternManager = new RGBPatternManager(rgbController);
+        #endif
     }
 
     void App::setup() {
+        randomSeed(analogRead(0));
         matrix.begin(0x70);
         delay(100);
         matrix.clear();
@@ -103,7 +107,7 @@ namespace Wallock {
 
     void App::run() {
         rotary.tick();
-        colorManager.tick();
+        rgbController.tick();
         int brightness = state.currentBrightness();
 
         if (wasKnobRotated()) {
@@ -160,7 +164,7 @@ namespace Wallock {
 
     void App::showColor(long color) {
 #if ENABLE_ENCODER_RGB
-      colorManager.blink(color, 1010, 1);
+      rgbController.blink(color, 1010, 1);
 #endif
     }
 
@@ -205,37 +209,9 @@ namespace Wallock {
     void App::displayTime(short hour, short minute) {
         short h = hour;
         short m = minute;
-        static rgb_color_t cycleColors[] = {
-                ColorNames::aqua,
-                ColorNames::palevioletred,
-                ColorNames::maroon,
-                ColorNames::indigo,
-                ColorNames::burlywood,
-                ColorNames::darkgoldenrod,
-                ColorNames::darkred,
-                ColorNames::teal,
-                ColorNames::mediumpurple,
-                ColorNames::deeppink,
-                ColorNames::crimson,
-                ColorNames::magenta,
-                ColorNames::lightsteelblue,
-                ColorNames::olivedrab,
-                ColorNames::orchid,
-                ColorNames::peru,
-                ColorNames::orangered,
-                ColorNames::plum,
-                ColorNames::thistle,
-                ColorNames::turquoise,
-                ColorNames::seagreen,
-        };
-
-        size_t cycleColorsNum = sizeof(cycleColors) / sizeof(rgb_color_t);
         if (h < 0 && m < 0) return;
-        currentColorIndex = (h*60 + m) % cycleColorsNum;
-        rgb_color_t now_color = (rgb_color_t) cycleColors[currentColorIndex];
-        rgb_color_t next_color = (rgb_color_t) cycleColors[(currentColorIndex + 1) % cycleColorsNum];
-        // For dots and the colon:
 
+        // For dots and the colon:
         // 0x02 - left colon - lower dot
         // 0x04 - center colon
         // 0x08 - left colon - upper dot
@@ -243,7 +219,7 @@ namespace Wallock {
 
         matrix.clear();
         bool colonOn = state.getValues().colonOn;
-        uint8_t                bitmask  = 0x00;
+        uint8_t bitmask  = 0x00;
         if (h < 0 || m < 0) {
           // configuring time
           colonOn = false;
@@ -256,7 +232,7 @@ namespace Wallock {
           if (colonOn) {
             bitmask |= 0x02;
           }
-          colorManager.fade(now_color, next_color, 500);
+          patternManager->fadeToNext(500);
         }
 
         // hours
@@ -336,12 +312,12 @@ namespace Wallock {
 
     void App::eventHold() {
         delay(200);
-        if (colorManager.isEnabled()) {
-          colorManager.disable();
+        if (rgbController.isEnabled()) {
+          rgbController.disable();
         } else {
           toggleDisplay();
           if (state.getValues().displayOn) {
-            colorManager.enable();
+            rgbController.enable();
           }
         }
     }

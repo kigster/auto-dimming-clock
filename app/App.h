@@ -31,7 +31,8 @@
 #endif
 
 #if ENABLE_ENCODER_RGB
-#include "RGBColorController.h"
+#include "RGBController.h"
+#include "RGBPatternManager.h"
 #endif
 
 
@@ -79,7 +80,7 @@ namespace Wallock {
                             State                       &_state,
                             RotaryEncoderWithButton     &_rotary,
                             Adafruit_7segment           &_matrix,
-                            RGBController                &_color
+                            RGBController               &_color
             );
 #else
             App(            PinoutMapping               &_pinout,
@@ -90,7 +91,8 @@ namespace Wallock {
 
 #endif
 #if ENABLE_ENCODER_RGB
-            RGBController                                &colorManager;
+            RGBController                               &rgbController;
+            RGBPatternManager                           *patternManager = NULL;
 #endif
             SetTime::TimeMode mode;
 
