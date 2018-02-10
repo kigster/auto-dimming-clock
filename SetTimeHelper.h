@@ -8,7 +8,7 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 
-#include "../Wallock.h"
+#include "Wallock.h"
 
 #if ENABLE_SET_TIME
 
@@ -20,7 +20,7 @@
 #include <Time.h>
 #include <DS1307RTC.h>
 
-typedef void(*timeCallback)(tmElements_t);
+//typedef void(*timeCallback)(tmElements_t);
 
 class SetTimeHelper {
 public:

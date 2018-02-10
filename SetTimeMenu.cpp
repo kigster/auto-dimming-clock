@@ -7,7 +7,7 @@
  *
  *  (c) 2014 All rights reserved, MIT License.
  */
-#include "../Wallock.h"
+#include "Wallock.h"
 #if ENABLE_MENU
 #include "SetTimeMenu.h"
 #include "App.h"
@@ -125,7 +125,7 @@ namespace Wallock {
     app->displayTime((app->mode == SetTime::Hour ? h : -1), (app->mode == SetTime::Minute ? m : -1));
 
     while (true) {
-      app->getRotary()->tick();
+      app->getButton()->tick();
       if (app->mode != startMode)
         break;
 
@@ -133,7 +133,7 @@ namespace Wallock {
       app->rgbController.tick();
 #endif
 
-      int delta = app->getRotary()->delta();
+      int delta = app->getRotary()->rotaryDelta();
       if (abs(delta) < 2) {
         delay(20);
         continue;

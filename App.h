@@ -11,7 +11,7 @@
 #ifndef BEDTIMEAPP_H_
 #define BEDTIMEAPP_H_
 
-#include "../Wallock.h"
+#include "Wallock.h"
 #include "State.h"
 
 

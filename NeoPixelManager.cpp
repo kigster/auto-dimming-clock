@@ -8,7 +8,7 @@
  *  (c) 2014 All rights reserved, MIT License.
  */
 
-#include "../Wallock.h"
+#include "Wallock.h"
 #if ENABLE_NEOPIXELS
 
 #include "NeoPixelManager.h"

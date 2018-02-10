@@ -17,7 +17,7 @@
 #define ENABLE_SET_TIME             true
 #define ENABLE_MENU                 true
 #define ENABLE_LCD                  false
-#define ENABLE_ENCODER_RGB          true
+#define ENABLE_ENCODER_RGB          false
 #define ENABLE_NEOPIXELS            false
 #define ENCODER_USE_INTERRUPTS      true
 

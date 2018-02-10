@@ -10,7 +10,7 @@
 
 #ifndef GAUGEDVALUE_H_
 #define GAUGEDVALUE_H_
-#include "../Wallock.h"
+#include "Wallock.h"
 
 
 #define INRANGE(X, MIN, MAX) (min(max(X, MIN), MAX))

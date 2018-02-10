@@ -34,3 +34,4 @@ spec.d
 **/.DS_Store
 arduino/
 .settings/*
+*.hex

@@ -10,7 +10,7 @@
 
 #ifndef APP_RGBPATTERNMANAGER_H_
 #define APP_RGBPATTERNMANAGER_H_
-#include "../Wallock.h"
+#include "Wallock.h"
 
 #include "RGBController.h"
 

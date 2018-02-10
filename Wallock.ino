@@ -15,11 +15,15 @@
  * Author: Konstantin Gredeskoul <kigster@gmail.com>
  */
 #include "Wallock.h"
-#include "app/App.h"
-#include "app/AppInstance.h"
-#include "app/RGBController.h"
-#include "app/State.h"
+#include "App.h"
+#include "AppInstance.h"
+#if ENABLE_ENCODER_RGB
+#include "RGBController.h"
+#endif 
 
+#include "State.h"
+#include <Time.h>
+#include <OneButton.h>
 
 char buffer[200];
 
@@ -36,11 +40,12 @@ Wallock::PinoutMapping pinout = {
          2      // Number of NeoPixels
 };
 
+OneButton button(pinout.pinRotaryButton, 0);
+
 RotaryEncoderWithButton rotary(
                 (uint8_t) pinout.pinRotaryLeft,
                 (uint8_t) pinout.pinRotaryRight,
-                (uint8_t) pinout.pinRotaryButton,
-                ENCODER_BTN_ACTIVE_LOW
+                (uint8_t) pinout.pinRotaryButton
                 );
 
 #if ENABLE_ENCODER_RGB
@@ -62,8 +67,8 @@ Wallock::State state(gvPhotoReadout, gvBrightness);
 SimpleTimer timer;
 
 #if ENABLE_NEOPIXELS
-#include "app/NeoPixelEffects.h"
-#include "app/NeoPixelManager.h"
+#include "NeoPixelEffects.h"
+#include "NeoPixelManager.h"
 #endif
 
 #if TEENSYDUINO
@@ -94,6 +99,15 @@ SimpleTimer timer;
     }
 #endif
 
+void logTime(char *timeType, tmElements_t tm) {
+    sprintf(buffer,
+                    "%s TIME: %d/%d/%d %02d:%02d:%02d | time_t: ",
+                    timeType,
+                    tm.Month, tm.Day, tmYearToCalendar(tm.Year), tm.Hour, tm.Minute, tm.Second);
+    Serial.print(buffer);
+    Serial.println( makeTime(tm));
+}
+
 bool detectRTC() {
     tmElements_t &tm = app.helper.currentTime;
 #ifndef TEENSYDUINO
@@ -119,15 +133,6 @@ bool detectRTC() {
         logTime("UPDATED", app.helper.currentTime);
 
     return true;
-}
-
-void logTime(char *timeType, tmElements_t tm) {
-    sprintf(buffer,
-                    "%s TIME: %d/%d/%d %02d:%02d:%02d | time_t: ",
-                    timeType,
-                    tm.Month, tm.Day, tmYearToCalendar(tm.Year), tm.Hour, tm.Minute, tm.Second);
-    Serial.print(buffer);
-    Serial.println( makeTime(tm));
 }
 
 void setup() {

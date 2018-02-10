@@ -1,15 +1,17 @@
 /*
- * color.h
- *
- *  Created on: Sep 6, 2015
- *      Author: Konstantin Gredeskoul
- *        Code: https://github.com/kigster
- *
- *  (c) 2014 All rights reserved, MIT License.
- */
+   color.h
+
+    Created on: Sep 6, 2015
+        Author: Konstantin Gredeskoul
+          Code: https://github.com/kigster
+
+    (c) 2014 All rights reserved, MIT License.
+*/
 
 #ifndef APP_RGBCONTROLLER_H_
 #define APP_RGBCONTROLLER_H_
+
+#include "Wallock.h"
 
 #if ENABLE_ENCODER_RGB
 
@@ -18,31 +20,31 @@
 #include "Arduino.h"
 namespace Wallock {
 
-    typedef enum RGBOverTimeMode_e {
-        Normal    = (1 << 0),
-        Blinking  = (1 << 1),
-        Fading    = (1 << 2),
-    } RGBOverTimeMode;
+typedef enum RGBOverTimeMode_e {
+  Normal    = (1 << 0),
+  Blinking  = (1 << 1),
+  Fading    = (1 << 2),
+} RGBOverTimeMode;
 
-  /**
-   * Class that wraps three separate LEDs and treats them as a single LED.
-   */
+/**
+   Class that wraps three separate LEDs and treats them as a single LED.
+*/
 
-  class RGBController {
+class RGBController {
 
-    private:
-      RGBColor _color;
-      RGBColor _fadeFrom = 0, _fadeTo = 0;
-      uint8_t _pins[3];
-      uint32_t _lastUpdateAt = 0, _fadeStartedAt = 0;
-      uint32_t _periodMs = 0;
-      RGBOverTimeMode _mode = Normal;
-      bool _enabled = true;
-      long _blinkCount = 0, _blinkForCount = 0;
-      bool _lastBlinkStateOn = false;
+  private:
+    RGBColor _color;
+    RGBColor _fadeFrom = 0, _fadeTo = 0;
+    uint8_t _pins[3];
+    uint32_t _lastUpdateAt = 0, _fadeStartedAt = 0;
+    uint32_t _periodMs = 0;
+    RGBOverTimeMode _mode = Normal;
+    bool _enabled = true;
+    long _blinkCount = 0, _blinkForCount = 0;
+    bool _lastBlinkStateOn = false;
 
-    public:
-    RGBController(uint8_t _pinR, uint8_t _pinG, uint8_t _pinB) : _color(0,0,0) {
+  public:
+    RGBController(uint8_t _pinR, uint8_t _pinG, uint8_t _pinB) : _color(0, 0, 0) {
       _pins[0] = _pinR;
       _pins[1] = _pinG;
       _pins[2] = _pinB;
@@ -70,7 +72,7 @@ namespace Wallock {
     }
 
     void blink(rgb_color_t color, long periodMs) {
-       blink(color, periodMs, 0);
+      blink(color, periodMs, 0);
     }
 
     // times = 0 for unlimited
@@ -124,7 +126,7 @@ namespace Wallock {
       _enabled = false;
     }
 
-private:
+  private:
     void _reset() {
       _mode = Normal;
       _fadeFrom = _fadeTo = 0;
@@ -176,16 +178,16 @@ private:
             float _ratio = 1.0 * (_now - _fadeStartedAt) / _periodMs;
             RGBColor _intermediate = _fadeFrom.scaleTo(_fadeTo, _ratio);
             if (_now - _lastUpdateAt > 100) {
-//              printf("fading color, from [%d,%d,%d] to [%d,%d,%d] via [%d,%d,%d]",
-//                      _fadeFrom.r,
-//                      _fadeFrom.g,
-//                      _fadeFrom.b,
-//                      _fadeTo.r,
-//                      _fadeTo.g,
-//                      _fadeTo.b,
-//                      _intermediate.r,
-//                      _intermediate.g,
-//                      _intermediate.b);
+              //              printf("fading color, from [%d,%d,%d] to [%d,%d,%d] via [%d,%d,%d]",
+              //                      _fadeFrom.r,
+              //                      _fadeFrom.g,
+              //                      _fadeFrom.b,
+              //                      _fadeTo.r,
+              //                      _fadeTo.g,
+              //                      _fadeTo.b,
+              //                      _intermediate.r,
+              //                      _intermediate.g,
+              //                      _intermediate.b);
               _lastUpdateAt = _now;
             }
             _setColor(_intermediate);
@@ -196,17 +198,17 @@ private:
 
     void _write() {
       if (isEnabled()) {
-          analogWrite(_pins[0], 255 - _color.r);
-          analogWrite(_pins[1], 255 - _color.g);
-          analogWrite(_pins[2], 255 - _color.b);
+        analogWrite(_pins[0], 255 - _color.r);
+        analogWrite(_pins[1], 255 - _color.g);
+        analogWrite(_pins[2], 255 - _color.b);
       } else {
         _off();
       }
     }
-  };
-
-#endif /* ENABLE_ENCODER_RGB */
+};
 
 } /* namespace Wallock */
 
+#endif /* ENABLE_ENCODER_RGB */
 #endif /* APP_RGBCONTROLLER_H_ */
+

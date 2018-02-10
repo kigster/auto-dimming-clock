@@ -1,3 +1,5 @@
+#include <TimeLib.h>
+
 /*
  * BedTimeApp.cpp
  *
@@ -9,9 +11,11 @@
  */
 
 #include <Arduino.h>
-#include "../Wallock.h"
+#include "Wallock.h"
 #include "App.h"
 #include "AppInstance.h"
+
+extern uint32_t freeRam();
 
 namespace Wallock {
 #if ENABLE_ENCODER_RGB
@@ -25,7 +29,7 @@ namespace Wallock {
                     rotary(_rotary),
                     matrix(_matrix),
                     rgbController(_colorManager),
-                    button(_rotary.button)
+                    button(button)
 #else
     App::App(       PinoutMapping               &_pinout,
                     State                       &_state,
@@ -35,7 +39,7 @@ namespace Wallock {
                     state (_state),
                     rotary(_rotary),
                     matrix(_matrix),
-                    button(_rotary.button)
+                    button(button)
 #endif
     {
 
@@ -106,8 +110,10 @@ namespace Wallock {
 
 
     void App::run() {
-        rotary.tick();
+        #if ENABLE_ENCODER_RGB
         rgbController.tick();
+        #endif 
+        
         int brightness = state.currentBrightness();
 
         if (wasKnobRotated()) {
@@ -123,7 +129,7 @@ namespace Wallock {
     }
 
     bool App::wasKnobRotated() {
-        long delta = rotary.delta();
+        long delta = rotary.rotaryDelta();
         if (abs(delta) >= 1) {
             delta = (delta > 0) ? min(delta, 2) : max(delta, -2);
             if (state.getBrightness().changeCurrentBy(delta)) {
@@ -232,7 +238,9 @@ namespace Wallock {
           if (colonOn) {
             bitmask |= 0x02;
           }
+          #if ENABLE_ENCODER_RGB
           patternManager->fadeToNext(500);
+          #endif
         }
 
         // hours
@@ -312,14 +320,14 @@ namespace Wallock {
 
     void App::eventHold() {
         delay(200);
-        if (rgbController.isEnabled()) {
-          rgbController.disable();
-        } else {
-          toggleDisplay();
-          if (state.getValues().displayOn) {
-            rgbController.enable();
-          }
-        }
+#if ENABLE_ENCODER_RGB
+        if (rgbController.isEnabled()) { rgbController.disable(); } 
+#endif        
+        toggleDisplay();
+
+#if ENABLE_ENCODER_RGB
+        if (state.getValues().displayOn) { rgbController.enable(); }
+#endif        
     }
 
     void App::toggleDisplay() {
