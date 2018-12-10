@@ -1,3 +1,5 @@
+#include <Encoder.h>
+
 /*
  * Wallock.h – feature flags
  *
@@ -19,7 +21,8 @@
 #define ENABLE_LCD                  false
 #define ENABLE_ENCODER_RGB          false
 #define ENABLE_NEOPIXELS            false
-#define ENCODER_USE_INTERRUPTS      true
+#define ENCODER_USE_INTERRUPTS      false
+#define ENCODER_DO_NOT_USE_INTERRUPTS true
 
 #define BRIGHTNESS_MAX              15
 #define BRIGHTNESS_MIN              0
@@ -30,6 +33,9 @@
 #define DEBUG                       false
 #define ANALOG_OUTPUT_RESOLUTION    256
 #define LOAD_COLOR_NAMES            true
+
+
+
 
 
 #define CYCLE_COLOR_THEME_ONE`
@@ -49,5 +55,3 @@ extern char buffer[];
 extern uint32_t freeRam();
 extern SimpleTimer timer;
 #endif // _WALLOC_H_
-
-

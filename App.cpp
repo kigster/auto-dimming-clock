@@ -15,6 +15,8 @@
 #include "App.h"
 #include "AppInstance.h"
 
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+
 extern uint32_t freeRam();
 
 namespace Wallock {
@@ -22,24 +24,26 @@ namespace Wallock {
     App::App(       PinoutMapping               &_pinout,
                     State                       &_state,
                     RotaryEncoderWithButton     &_rotary,
+                    OneButton                   &_button,
                     Adafruit_7segment           &_matrix,
                     RGBController               &_colorManager) :
                     pinout(_pinout),
                     state (_state),
                     rotary(_rotary),
+                    button(_button),
                     matrix(_matrix),
-                    rgbController(_colorManager),
-                    button(button)
+                    rgbController(_colorManager)
 #else
     App::App(       PinoutMapping               &_pinout,
                     State                       &_state,
                     RotaryEncoderWithButton     &_rotary,
+                    OneButton                   &_button,
                     Adafruit_7segment           &_matrix) :
                     pinout(_pinout),
                     state (_state),
                     rotary(_rotary),
-                    matrix(_matrix),
-                    button(button)
+                    button(_button),
+                    matrix(_matrix)
 #endif
     {
 
@@ -92,20 +96,29 @@ namespace Wallock {
     }
 
     void App::logStatus() {
-        tmElements_t tm = getCurrentTime();
+        int now = millis();
 
-        sprintf(buffer, "%2d/%2d/%4d %2d:%02d:%02d | FREE MEM: %4dB | ",
-                        tm.Month, tm.Day, tmYearToCalendar(tm.Year),
-                        tm.Hour, tm.Minute, tm.Second,
-                        freeRam());
-        Serial.print(buffer);
-        sprintf(buffer, "BRT: %2d ~%3d%% | PHT: %3d ~%3d%% | OFF: %3d",
-                        state.currentBrightness(),
-                        (int)(state.getBrightness().getCurrentAsPercentOfRange()),
-                        state.currentPhotoReadout(),
-                        (int)(state.getPhotoReadout().getCurrentAsPercentOfRange()),
-                        state.getPhotoReadout().offset);
-        Serial.println(buffer);
+        if (now - lastLoggedAt > 1000) { 
+          tmElements_t tm = getCurrentTime();
+          lastLoggedAt = now;
+ 
+          sprintf(buffer, "%2d/%2d/%4d %2d:%02d:%02d | Free Ram: %4dB | ",
+                          tm.Month, tm.Day, tmYearToCalendar(tm.Year),
+                          tm.Hour, tm.Minute, tm.Second,
+                          freeRam());
+          Serial.print(buffer);
+          sprintf(buffer, "Brightness: %2d ~%3d%% | Range: [%d..%d] | Photo: %3d ~%3d%% | Pot: %d ~%3d%",
+                          state.currentBrightness(),
+                          (int)(state.getBrightness().getCurrentAsPercentOfRange()),
+                          (int)(state.getBrightness().getRangeStart()),
+                          (int)(state.getBrightness().getRangeEnd()),
+                          state.currentPhotoReadout(),
+                          (int)(state.getPhotoReadout().getCurrentAsPercentOfRange()),
+                          lastPotValue, 
+                          100.0 * lastPotValue / 1023.0
+                          );
+          Serial.println(buffer);
+        }
     }
 
 
@@ -113,59 +126,94 @@ namespace Wallock {
         #if ENABLE_ENCODER_RGB
         rgbController.tick();
         #endif 
+
+        getButton()->tick();
         
         int brightness = state.currentBrightness();
 
         if (wasKnobRotated()) {
             state.getPhotoReadout().syncOffsetTo(&state.getBrightness());
-        } else if (readPhotoTrueIfChanged()) {
+        } else if (readPotentiometer()) {          
+            updateDisplayBrightness();         
+        } else if (readPhotoTrueIfChanged()) {         
             state.getBrightness().follow(&state.getPhotoReadout());
-        }
-
-        if (brightness != state.currentBrightness()) {
             updateDisplayBrightness();
-            logStatus();
+        } 
+        logStatus();
+    }
+
+    bool App::readPotentiometer() {
+      int now = millis();
+      if (now - potCheckedAt > 40) {
+        potCheckedAt = now;
+        int val = analogRead(pinout.pinPot);    // read the value from the sensor
+        if (abs(val - lastPotValue) > 1) { 
+          sprintf(buffer, "Potentiometer Readout: %5d", val);
+          Serial.println(buffer);
+          state.getBrightness().setCurrentFromPercentage(100.0 * MIN(val, 1000) / 1000);
+          lastPotValue = val; 
+          
+          val = val - 512;
+          
+          if (val < 100 && val > -100) {
+            state.getBrightness().setMax(BRIGHTNESS_MAX);
+            state.getBrightness().setMin(BRIGHTNESS_MIN);
+          } else if (val == 1023 - 512) {
+            state.getBrightness().setMax(BRIGHTNESS_MAX);
+            state.getBrightness().setMin(BRIGHTNESS_MIN);
+            state.getBrightness().setCurrentFromPercentage(100.0);
+          } else if (val > 0) {
+            int min = map(val, 0, 512, BRIGHTNESS_MIN, BRIGHTNESS_MAX/2);
+            state.getBrightness().setMax(BRIGHTNESS_MAX);
+            state.getBrightness().setMin(min);
+          } else if (val < 0) {
+            int max = map(val, -512, 0, BRIGHTNESS_MAX/2, BRIGHTNESS_MAX);
+            state.getBrightness().setMax(max);
+            state.getBrightness().setMin(BRIGHTNESS_MIN);
+          }
+          
+          return true;
         }
+      }             
+      return false;
     }
 
     bool App::wasKnobRotated() {
         long delta = rotary.rotaryDelta();
-        if (abs(delta) >= 1) {
-            delta = (delta > 0) ? min(delta, 2) : max(delta, -2);
-            if (state.getBrightness().changeCurrentBy(delta)) {
-                return true;
-            }
-        }
         return false;
     }
 
     bool App::readPhotoTrueIfChanged() {
-        #if ENABLE_PHOTORESISTOR
+#if ENABLE_PHOTORESISTOR
+        int now = millis();
+        if (now - lastPhotoCheckedAt > 200) {        
+            lastPhotoCheckedAt = now;
             int reading = analogRead(pinout.pinPhotoResistor);
             bool changed = state.getPhotoReadout().setCurrent(reading);
 
-            #if DEBUG
-                if (changed || millis() - lastDisplayedTime > 5000) {
-                    sprintf(buffer, "PHOTO ACTUAL: (%3d) {0..1023} | ", reading);
-                    Serial.print(buffer);
-                    logStatus();
-                    lastDisplayedTime = millis();
-                }
-            #endif
+#if DEBUG
+            if (changed || now - lastDisplayedTime > 1000) {
+                sprintf(buffer, "Photo Resistor Raw: (%3d) {0..1023} | ", reading);
+                Serial.println(buffer);
+                logStatus();
+                lastDisplayedTime = now;
+            }
+#endif
 
-            #if ENABLE_LCD
-                lcd->setCursor(0,2);
-                lcd->print("Photo Value: ");
-                sprintf(buffer, "%4d", state.currentPhotoReadout());
-                lcd->print(buffer);
-            #endif
+#if ENABLE_LCD
+            lcd->setCursor(0,2);
+            lcd->print("Photo Value: ");
+            sprintf(buffer, "%4d", state.currentPhotoReadout());
+            lcd->print(buffer);
+#endif
 
             return changed;
-
+        } else {
+          return false;
+        }
         #else
-            return false;
+        return false;
         #endif
-
     }
 
     void App::showColor(long color) {

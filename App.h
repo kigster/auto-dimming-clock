@@ -50,6 +50,7 @@ namespace SetTime {
 namespace Wallock {
     typedef struct PinoutMapping_s {
          uint8_t pinPhotoResistor;
+         uint8_t pinPot;
          uint8_t pinRotaryLeft;
          uint8_t pinRotaryRight;
          uint8_t pinRotaryButton;
@@ -66,8 +67,8 @@ namespace Wallock {
             Adafruit_7segment                           &matrix;
             OneButton                                   &button;
 
-            uint32_t                                    lastDisplayedTime;
-            long                                        currentColorIndex;
+            uint32_t                                    lastDisplayedTime, potCheckedAt, lastPhotoCheckedAt, lastLoggedAt;
+            long                                        currentColorIndex, lastPotValue = 0;
             void logStatus();
 
             bool readPhotoTrueIfChanged();
@@ -79,6 +80,7 @@ namespace Wallock {
             App(            PinoutMapping               &_pinout,
                             State                       &_state,
                             RotaryEncoderWithButton     &_rotary,
+                            OneButton                   &_button,
                             Adafruit_7segment           &_matrix,
                             RGBController               &_color
             );
@@ -86,6 +88,7 @@ namespace Wallock {
             App(            PinoutMapping               &_pinout,
                             State                       &_state,
                             RotaryEncoderWithButton     &_rotary,
+                            OneButton                   &_button,
                             Adafruit_7segment           &_matrix
             );
 
@@ -120,6 +123,7 @@ namespace Wallock {
             void displayTime(short h, short m);
 
             void updateDisplayBrightness();
+            bool readPotentiometer();
 
             void toggleDisplay();
             void toggleNeoPixels();

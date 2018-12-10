@@ -27,56 +27,6 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>Libraries/Adafruit_GFX</name>
-			<type>2</type>
-			<locationURI>ArduinoPrivateLibPath/Adafruit_GFX</locationURI>
-		</link>
-		<link>
-			<name>Libraries/Adafruit_LEDBackpack</name>
-			<type>2</type>
-			<locationURI>ArduinoPrivateLibPath/Adafruit_LEDBackpack</locationURI>
-		</link>
-		<link>
-			<name>Libraries/Adafruit_NeoPixel</name>
-			<type>2</type>
-			<locationURI>ArduinoPrivateLibPath/Adafruit_NeoPixel</locationURI>
-		</link>
-		<link>
-			<name>Libraries/DS1307RTC</name>
-			<type>2</type>
-			<locationURI>ArduinoPrivateLibPath/DS1307RTC</locationURI>
-		</link>
-		<link>
-			<name>Libraries/Encoder</name>
-			<type>2</type>
-			<locationURI>ArduinoPrivateLibPath/Encoder</locationURI>
-		</link>
-		<link>
-			<name>Libraries/OneButton</name>
-			<type>2</type>
-			<locationURI>ArduinoPrivateLibPath/OneButton</locationURI>
-		</link>
-		<link>
-			<name>Libraries/RotaryEncoderWithButton</name>
-			<type>2</type>
-			<locationURI>ArduinoPrivateLibPath/RotaryEncoderWithButton</locationURI>
-		</link>
-		<link>
-			<name>Libraries/SimpleTimer</name>
-			<type>2</type>
-			<locationURI>ArduinoPrivateLibPath/SimpleTimer</locationURI>
-		</link>
-		<link>
-			<name>Libraries/Time</name>
-			<type>2</type>
-			<locationURI>ArduinoPrivateLibPath/Time</locationURI>
-		</link>
-		<link>
-			<name>Libraries/Wire</name>
-			<type>2</type>
-			<locationURI>ArduinoHardwareLibPath/Wire</locationURI>
-		</link>
-		<link>
 			<name>arduino/core</name>
 			<type>2</type>
 			<locationURI>ArduinoPlatformPath/arduino</locationURI>

@@ -51,9 +51,19 @@ namespace Wallock {
             offset      = 0;
 
         }
+        
         void ensureRange(int *value) {
             *value = INRANGE(*value, rangeStart, rangeEnd);
         }
+
+        void setMax(int value) {
+          rangeEnd = value;
+        }
+
+        void setMin(int value) {
+          rangeStart = value;
+        }
+
 
         // returns a possibly adjusted by offset value
         signed int getCurrent() {
@@ -74,11 +84,15 @@ namespace Wallock {
         }
 
         bool setCurrentFromPercentage(float perc) {
-            perc = INRANGE(perc, 0, 100);
-            int newValue = (int)((perc / 100.0) * ((float) rangeEnd - rangeStart) + rangeStart);
-            if (current != newValue) {
-                current = newValue;
-                return true;
+            if (abs(perc - 100.0) < 0.1) { 
+              current = rangeEnd;
+            } else {
+              perc = INRANGE(perc, 0, 100);
+              int newValue = (int)((1.0 * perc / 100.0) * ((float) rangeEnd - rangeStart) + rangeStart);
+              if (current != newValue) {
+                  current = newValue;
+                  return true;
+              }            
             }
             return false;
         }
