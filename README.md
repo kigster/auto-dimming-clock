@@ -1,4 +1,3 @@
-
 Auto-Dimming Clock with Seven-Segment Digital Display
 =========
 
@@ -27,6 +26,7 @@ Additional features include:
 The enclosure you see on the picture is made from 1/8" acrylic using matte black color, and semi-transparent black for the front panel.
 
 ![Clock Front View](images/clock_front.jpg)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkigster%2Fauto-dimming-clock.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkigster%2Fauto-dimming-clock?ref=badge_shield)
 
 Functionality
 =============
@@ -75,3 +75,7 @@ Author
 (c) 2015 Konstantin Gredeskoul, https://github.com/kigster
 
 Distributed under MIT license, see [LICENSE](LICENSE).
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkigster%2Fauto-dimming-clock.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkigster%2Fauto-dimming-clock?ref=badge_large)
